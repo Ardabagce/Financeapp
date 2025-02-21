@@ -132,16 +132,18 @@ export default function Gelir() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
       {/* Üst Kart */}
-      <View style={[styles.topCard, { backgroundColor: tema.cardBackground }]}>
+      <View style={[styles.topCard, { 
+        backgroundColor: tema.success,
+      }]}>
         <View style={styles.topCardHeader}>
-          <Text style={[styles.topCardTitle, { color: tema.text }]}>
+          <Text style={[styles.topCardTitle, { color: '#fff' }]}>
             {t('toplamGelir')}
           </Text>
         </View>
-        <Text style={[styles.balanceAmount, { color: tema.text }]}>
+        <Text style={[styles.balanceAmount, { color: '#fff' }]}>
           {paraBirimiSembol}{formatNumber(gelirler.reduce((sum, item) => sum + item.miktar, 0).toFixed(2))}
         </Text>
-        <Text style={[styles.balanceChange, { color: tema.textSecondary }]}>
+        <Text style={[styles.balanceChange, { color: '#fff', opacity: 0.8 }]}>
           {t('buAyEklenenGelir')}: {gelirler.length}
         </Text>
       </View>
@@ -175,7 +177,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   topCard: {
-    backgroundColor: '#4CAF50',
     margin: 16,
     padding: 20,
     borderRadius: 16,

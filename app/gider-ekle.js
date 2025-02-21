@@ -174,28 +174,33 @@ export default function GiderEkle() {
                 {t('kategori')}
               </Text>
               <View style={styles.kategoriler}>
-                {kategoriler.map((kategori) => (
+                {kategoriler.map((kat) => (
                   <TouchableOpacity
-                    key={kategori.id}
+                    key={kat.id}
                     style={[
                       styles.kategoriButon,
                       { 
                         backgroundColor: tema.cardBackground,
-                        borderColor: tema.border
+                        borderColor: tema.border,
+                        borderWidth: 1,
                       },
-                      kategori.id === kategori && { 
-                        backgroundColor: tema.selectedBackground,
-                        borderColor: tema.danger
+                      kategori === kat.id && { 
+                        backgroundColor: tema.dangerLight,
+                        borderColor: tema.danger,
+                        borderWidth: 2,
                       }
                     ]}
-                    onPress={() => setKategori(kategori.id)}
+                    onPress={() => setKategori(kat.id)}
                   >
                     <Text style={[
                       styles.kategoriText,
                       { color: tema.text },
-                      kategori.id === kategori && { color: tema.danger }
+                      kategori === kat.id && { 
+                        color: tema.danger,
+                        fontWeight: '600'
+                      }
                     ]}>
-                      {kategori.ad}
+                      {t(kat.id.toLowerCase())}
                     </Text>
                   </TouchableOpacity>
                 ))}

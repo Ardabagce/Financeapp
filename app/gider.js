@@ -131,16 +131,18 @@ export default function Gider() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
       {/* Üst Kart */}
-      <View style={[styles.topCard, { backgroundColor: tema.cardBackground }]}>
+      <View style={[styles.topCard, { 
+        backgroundColor: tema.danger,
+      }]}>
         <View style={styles.topCardHeader}>
-          <Text style={[styles.topCardTitle, { color: tema.text }]}>
+          <Text style={[styles.topCardTitle, { color: '#fff' }]}>
             {t('toplamGider')}
           </Text>
         </View>
-        <Text style={[styles.balanceAmount, { color: tema.text }]}>
+        <Text style={[styles.balanceAmount, { color: '#fff' }]}>
           {paraBirimiSembol}{formatNumber(giderler.reduce((sum, item) => sum + item.miktar, 0).toFixed(2))}
         </Text>
-        <Text style={[styles.balanceChange, { color: tema.textSecondary }]}>
+        <Text style={[styles.balanceChange, { color: '#fff', opacity: 0.8 }]}>
           {t('buAyEklenenGider')}: {giderler.length}
         </Text>
       </View>
@@ -174,7 +176,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#f5f5f5',
   },
   topCard: {
-    backgroundColor: '#f44336',
     margin: 16,
     padding: 20,
     borderRadius: 16,
