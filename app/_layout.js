@@ -1,47 +1,88 @@
 import { Stack } from 'expo-router';
-import { FinansProvider } from './context/FinansContext';
+import { StatusBar } from 'expo-status-bar';
+import FinansProvider from './context/FinansContext';
 import { View } from 'react-native';
+import { memo } from 'react';
 import TabBar from './components/TabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import AyarlarProvider from './context/AyarlarContext';
+
+// TabBar'ı memoize edelim
+const MemoizedTabBar = memo(TabBar);
+
+// Ana ekranlar için options
+const mainScreenOptions = {
+  headerShown: false,
+  animation: 'fade',
+  animationDuration: 200,
+  contentStyle: {
+    backgroundColor: '#f5f5f5',
+  }
+};
+
+// Modal ekranlar için options
+const modalScreenOptions = {
+  headerShown: false,
+  presentation: 'modal',
+  animation: 'slide_from_bottom',
+  contentStyle: {
+    backgroundColor: '#000000',
+  },
+  animationDuration: 200,
+  gestureEnabled: true,
+  gestureDirection: 'vertical',
+  gestureResponseDistance: {
+    vertical: 200
+  },
+  cardStyle: { 
+    backgroundColor: '#000000',
+    opacity: 1
+  },
+  cardOverlayEnabled: false,
+  cardStyleInterpolator: ({ current: { progress } }) => ({
+    cardStyle: {
+      opacity: progress
+    }
+  })
+};
 
 export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <FinansProvider>
-        <View style={{ flex: 1 }}>
-          <Stack
-            screenOptions={{
-              headerShown: false,
-              animation: 'fade',
-              animationDuration: 200,
-              contentStyle: {
-                backgroundColor: '#f5f5f5',
-              },
-            }}
-          >
-            <Stack.Screen name="index" />
-            <Stack.Screen name="gelir" />
-            <Stack.Screen name="gider" />
-            <Stack.Screen 
-              name="gelir-ekle" 
-              options={{
-                presentation: 'modal',
-                headerShown: true,
-                title: 'Gelir Ekle',
-              }}
-            />
-            <Stack.Screen 
-              name="gider-ekle" 
-              options={{
-                presentation: 'modal',
-                headerShown: true,
-                title: 'Gider Ekle',
-              }}
-            />
-          </Stack>
-          <TabBar />
-        </View>
-      </FinansProvider>
+      <AyarlarProvider>
+        <FinansProvider>
+          <StatusBar style="auto" />
+          <View style={{ flex: 1 }}>
+            <Stack>
+              <Stack.Screen 
+                name="index" 
+                options={mainScreenOptions}
+              />
+              <Stack.Screen 
+                name="gelir" 
+                options={mainScreenOptions}
+              />
+              <Stack.Screen 
+                name="gider" 
+                options={mainScreenOptions}
+              />
+              <Stack.Screen 
+                name="ayarlar" 
+                options={mainScreenOptions}
+              />
+              <Stack.Screen 
+                name="gelir-ekle"
+                options={modalScreenOptions}
+              />
+              <Stack.Screen 
+                name="gider-ekle"
+                options={modalScreenOptions}
+              />
+            </Stack>
+            <MemoizedTabBar />
+          </View>
+        </FinansProvider>
+      </AyarlarProvider>
     </GestureHandlerRootView>
   );
 } 

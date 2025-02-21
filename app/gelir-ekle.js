@@ -8,31 +8,48 @@ import {
   KeyboardAvoidingView, 
   Platform,
   ScrollView,
-  Alert 
+  Alert,
+  Switch,
+  Keyboard,
+  SafeAreaView
 } from 'react-native';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFinans } from './context/FinansContext';
+import { useAyarlar } from './context/AyarlarContext';
 
 export default function GelirEkle() {
   const [miktar, setMiktar] = useState('');
   const [aciklama, setAciklama] = useState('');
-  const [kategori, setKategori] = useState('Diğer');
+  const [kategori, setKategori] = useState('');
+  const [yaklasan, setYaklasan] = useState(false);
   const router = useRouter();
-  const { gelirEkle, gelirGuncelle, gelirSil, gelirler } = useFinans();
+  const { gelirEkle, gelirGuncelle, gelirSil, gelirler, yaklasanGelirEkle, GELIR_KATEGORILERI } = useFinans();
   const params = useLocalSearchParams();
+  const { t, getParaBirimiSembol, tema } = useAyarlar();
+  const paraBirimiSembol = getParaBirimiSembol();
 
-  const kategoriler = ['Maaş', 'Ek Gelir', 'Yatırım', 'Hediye', 'Diğer'];
+  const kategoriler = [
+    { id: GELIR_KATEGORILERI.MAAS, ad: t(GELIR_KATEGORILERI.MAAS) },
+    { id: GELIR_KATEGORILERI.EK_GELIR, ad: t(GELIR_KATEGORILERI.EK_GELIR) },
+    { id: GELIR_KATEGORILERI.YATIRIM, ad: t(GELIR_KATEGORILERI.YATIRIM) },
+    { id: GELIR_KATEGORILERI.HEDIYE, ad: t(GELIR_KATEGORILERI.HEDIYE) },
+    { id: GELIR_KATEGORILERI.DIGER, ad: t(GELIR_KATEGORILERI.DIGER) }
+  ];
 
   useEffect(() => {
+    if (!kategori) {
+      setKategori(GELIR_KATEGORILERI.DIGER);
+    }
+    
     if (params.duzenle === 'true') {
       setMiktar(params.miktar || '');
       setAciklama(params.aciklama || '');
-      setKategori(params.kategori || 'Diğer');
+      setKategori(params.kategori || GELIR_KATEGORILERI.DIGER);
+      setYaklasan(params.yaklasan === 'true');
     }
-  }, [params]);
+  }, [GELIR_KATEGORILERI]);
 
   const gelirKaydet = async () => {
-    // Miktar kontrolü - virgüllü girişi noktalı formata çevir
     const temizMiktar = miktar.replace(',', '.');
     
     if (!temizMiktar || isNaN(parseFloat(temizMiktar))) {
@@ -54,12 +71,21 @@ export default function GelirEkle() {
           tarih: new Date(),
         });
       } else {
-        await gelirEkle({
-          miktar: parseFloat(temizMiktar),
-          aciklama,
-          kategori,
-          tarih: new Date(),
-        });
+        if (yaklasan) {
+          await yaklasanGelirEkle({
+            miktar: parseFloat(temizMiktar),
+            aciklama,
+            kategori,
+            tarih: new Date(),
+          });
+        } else {
+          await gelirEkle({
+            miktar: parseFloat(temizMiktar),
+            aciklama,
+            kategori,
+            tarih: new Date(),
+          });
+        }
       }
       router.back();
     } catch (error) {
@@ -86,102 +112,155 @@ export default function GelirEkle() {
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
-    >
-      <ScrollView style={styles.scrollView}>
-        <View style={styles.formContainer}>
-          <Text style={styles.baslik}>
-            {params.duzenle ? 'Gelir Düzenle' : 'Yeni Gelir Ekle'}
-          </Text>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Miktar (₺)</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Miktar"
-              keyboardType="decimal-pad"
-              value={miktar}
-              onChangeText={setMiktar}
-              placeholderTextColor="#999"
-            />
+    <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
+      <KeyboardAvoidingView 
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        style={styles.keyboardView}
+      >
+        <ScrollView>
+          <View style={[styles.header, { backgroundColor: tema.cardBackground }]}>
+            <Text style={[styles.title, { color: tema.text }]}>
+              {params?.duzenle ? t('gelirDuzenle') : t('yeniGelir')}
+            </Text>
+            <Text style={[styles.subtitle, { color: tema.textSecondary }]}>
+              {params?.duzenle ? t('gelirBilgileriGuncelle') : t('yeniGelirKaydi')}
+            </Text>
           </View>
 
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Açıklama</Text>
-            <TextInput
-              style={[styles.input, styles.textArea]}
-              placeholder="Gelir açıklaması..."
-              multiline
-              value={aciklama}
-              onChangeText={setAciklama}
-            />
-          </View>
-
-          <View style={styles.inputGroup}>
-            <Text style={styles.label}>Kategori</Text>
-            <View style={styles.kategoriler}>
-              {kategoriler.map((kat) => (
-                <TouchableOpacity
-                  key={kat}
-                  style={[
-                    styles.kategoriButon,
-                    kategori === kat && styles.seciliKategori
-                  ]}
-                  onPress={() => setKategori(kat)}
-                >
-                  <Text style={[
-                    styles.kategoriText,
-                    kategori === kat && styles.seciliKategoriText
-                  ]}>
-                    {kat}
-                  </Text>
-                </TouchableOpacity>
-              ))}
+          <View style={styles.form}>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: tema.text }]}>
+                {t('miktar')} ({paraBirimiSembol})
+              </Text>
+              <TextInput
+                style={[styles.input, { 
+                  backgroundColor: tema.cardBackground,
+                  color: tema.text,
+                  borderColor: tema.border
+                }]}
+                placeholderTextColor={tema.textTertiary}
+                placeholder={t('miktar')}
+                keyboardType="decimal-pad"
+                value={miktar}
+                onChangeText={(text) => setMiktar(text)}
+                returnKeyType="done"
+                blurOnSubmit={true}
+                onSubmitEditing={() => {
+                  Keyboard.dismiss();
+                }}
+              />
             </View>
-          </View>
-        </View>
-      </ScrollView>
 
-      <View style={styles.butonContainer}>
-        {params.duzenle && (
-          <TouchableOpacity 
-            style={styles.silButon}
-            onPress={geliriSil}
-          >
-            <Text style={styles.silButonText}>Sil</Text>
-          </TouchableOpacity>
-        )}
-        <TouchableOpacity 
-          style={styles.kaydetButon}
-          onPress={gelirKaydet}
-        >
-          <Text style={styles.kaydetButonText}>
-            {params.duzenle ? 'Güncelle' : 'Kaydet'}
-          </Text>
-        </TouchableOpacity>
-      </View>
-    </KeyboardAvoidingView>
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: tema.text }]}>
+                {t('aciklama')}
+              </Text>
+              <TextInput
+                style={[styles.input, { 
+                  backgroundColor: tema.cardBackground,
+                  color: tema.text,
+                  borderColor: tema.border
+                }]}
+                placeholderTextColor={tema.textTertiary}
+                placeholder={t('gelirAciklamasi')}
+                multiline={true}
+                value={aciklama}
+                onChangeText={(text) => setAciklama(text)}
+                textAlignVertical="top"
+              />
+            </View>
+
+            <View style={styles.inputGroup}>
+              <Text style={[styles.label, { color: tema.text }]}>
+                {t('kategori')}
+              </Text>
+              <View style={styles.kategoriler}>
+                {kategoriler.map((kategori) => (
+                  <TouchableOpacity
+                    key={kategori.id}
+                    style={[
+                      styles.kategoriButon,
+                      { 
+                        backgroundColor: tema.cardBackground,
+                        borderColor: tema.border
+                      },
+                      kategori.id === kategori && { 
+                        backgroundColor: tema.selectedBackground,
+                        borderColor: tema.success
+                      }
+                    ]}
+                    onPress={() => setKategori(kategori.id)}
+                  >
+                    <Text style={[
+                      styles.kategoriText,
+                      { color: tema.text },
+                      kategori.id === kategori && { color: tema.success }
+                    ]}>
+                      {t(kategori.id.toLowerCase())}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={[styles.switchContainer, { backgroundColor: tema.cardBackground }]}>
+              <View style={styles.switchInfo}>
+                <Text style={[styles.switchLabel, { color: tema.success }]}>
+                  {t('yaklasanGelir')}
+                </Text>
+                <Text style={[styles.switchDescription, { color: tema.textSecondary }]}>
+                  {t('yaklasanAciklama')}
+                </Text>
+              </View>
+              <Switch
+                value={yaklasan}
+                onValueChange={setYaklasan}
+                trackColor={{ false: tema.border, true: tema.success }}
+                thumbColor={yaklasan ? tema.success : tema.cardBackground}
+              />
+            </View>
+
+            <TouchableOpacity 
+              style={[styles.submitButton, { backgroundColor: tema.success }]}
+              onPress={gelirKaydet}
+            >
+              <Text style={styles.submitButtonText}>
+                {params?.duzenle ? t('guncelle') : t('kaydet')}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#000000', // Karanlık mod için siyah
   },
-  scrollView: {
+  keyboardView: {
     flex: 1,
   },
-  formContainer: {
+  header: {
     padding: 20,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  baslik: {
+  title: {
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
     color: '#2e7d32',
+    marginBottom: 4,
+  },
+  subtitle: {
+    fontSize: 14,
+    color: '#666',
+  },
+  form: {
+    padding: 20,
   },
   inputGroup: {
     marginBottom: 20,
@@ -193,15 +272,9 @@ const styles = StyleSheet.create({
   },
   input: {
     borderWidth: 1,
-    borderColor: '#ddd',
     padding: 15,
     borderRadius: 10,
     fontSize: 16,
-    backgroundColor: '#f9f9f9',
-  },
-  textArea: {
-    height: 100,
-    textAlignVertical: 'top',
   },
   kategoriler: {
     flexDirection: 'row',
@@ -212,41 +285,43 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#f0f0f0',
+    borderWidth: 2,
     margin: 5,
-  },
-  seciliKategori: {
-    backgroundColor: '#4CAF50',
   },
   kategoriText: {
     color: '#666',
   },
-  seciliKategoriText: {
-    color: 'white',
-  },
-  butonContainer: {
-    padding: 20,
+  switchContainer: {
     flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 20,
+    marginTop: 10,
   },
-  kaydetButon: {
+  switchInfo: {
     flex: 1,
-    backgroundColor: '#4CAF50',
+    marginRight: 15,
+  },
+  switchLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#4CAF50',
+    marginBottom: 4,
+  },
+  switchDescription: {
+    fontSize: 12,
+    color: '#666',
+    lineHeight: 16,
+  },
+  submitButton: {
+    flex: 1,
     padding: 15,
     borderRadius: 10,
     alignItems: 'center',
   },
-  kaydetButonText: {
-    color: 'white',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  silButon: {
-    backgroundColor: '#f44336',
-    padding: 15,
-    borderRadius: 10,
-    marginRight: 10,
-  },
-  silButonText: {
+  submitButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

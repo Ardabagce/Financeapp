@@ -1,31 +1,40 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert, SafeAreaView, Dimensions, Animated } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert, SafeAreaView, Dimensions, Animated, Pressable } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
+import { useAyarlar } from './context/AyarlarContext';
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 
 export default function Gider() {
   const router = useRouter();
-  const { giderler, giderSil, formatNumber } = useFinans();
+  const { giderler, giderSil, formatNumber, yaklasanGiderler, gideriTamamla, yaklasanGiderSil, GIDER_KATEGORILERI } = useFinans();
+  const { t, getParaBirimiSembol, tema } = useAyarlar();
+  const paraBirimiSembol = getParaBirimiSembol();
 
   const formatTarih = (tarih) => {
     return new Date(tarih).toLocaleDateString('tr-TR');
   };
 
   const gideriSil = (id) => {
+    const isYaklasan = yaklasanGiderler.some(g => g.id === id);
+    
     Alert.alert(
-      'Gideri Sil',
-      'Bu gideri silmek istediğinizden emin misiniz?',
+      t('gideriSil'),
+      t('gideriSilOnay'),
       [
-        { text: 'İptal', style: 'cancel' },
+        { text: t('iptal'), style: 'cancel' },
         { 
-          text: 'Sil', 
+          text: t('sil'), 
           style: 'destructive',
           onPress: async () => {
-            await giderSil(id);
+            if (isYaklasan) {
+              await yaklasanGiderSil(id);
+            } else {
+              await giderSil(id);
+            }
           }
         }
       ]
@@ -40,67 +49,106 @@ export default function Gider() {
           onPress={() => gideriSil(item.id)}
         >
           <Ionicons name="trash-outline" size={22} color="#fff" />
-          <Text style={styles.deleteText}>Sil</Text>
+          <Text style={styles.deleteText}>{t('silButon')}</Text>
         </TouchableOpacity>
       </View>
     );
   };
 
-  const renderGider = ({ item }) => (
-    <Swipeable
-      renderRightActions={(progress, dragX) => 
-        renderRightActions(progress, dragX, item)
-      }
-      overshootRight={false}
-      friction={2}
-    >
-      <View style={styles.giderItem}>
-        <View style={styles.leftBorder} />
-        <View style={styles.giderBilgi}>
-          <View style={styles.baslikRow}>
-            <Text style={styles.kategori}>{item.kategori || 'Diğer'}</Text>
-            <TouchableOpacity 
-              style={styles.islemButon}
-              onPress={() => router.push({
-                pathname: '/gider-ekle',
-                params: { 
-                  duzenle: true, 
-                  id: item.id,
-                  miktar: item.miktar.toString(),
-                  aciklama: item.aciklama,
-                  kategori: item.kategori
-                }
-              })}
-            >
-              <Ionicons name="pencil" size={18} color="#666" />
-            </TouchableOpacity>
+  const renderGider = ({ item }) => {
+    const isYaklasan = yaklasanGiderler.some(g => g.id === item.id);
+    
+    return (
+      <Swipeable
+        renderRightActions={(progress, dragX) => 
+          renderRightActions(progress, dragX, item)
+        }
+        overshootRight={false}
+        friction={2}
+      >
+        <Pressable
+          onLongPress={() => {
+            if (isYaklasan) {
+              Alert.alert(
+                t('gideriTamamla'),
+                t('gideriTamamlaOnay'),
+                [
+                  { text: t('iptal'), style: 'cancel' },
+                  { 
+                    text: t('tamamla'), 
+                    onPress: () => gideriTamamla(item.id)
+                  }
+                ]
+              );
+            }
+          }}
+          style={[
+            styles.giderItem,
+            { backgroundColor: tema.cardBackground },
+            isYaklasan && styles.yaklasanGider
+          ]}
+        >
+          <View style={[styles.leftBorder, { backgroundColor: tema.danger }]} />
+          <View style={styles.giderBilgi}>
+            <View style={styles.baslikRow}>
+              <Text style={[styles.kategori, { color: tema.text }]}>
+                {t(item.kategori?.toLowerCase() || 'kategori_diger')}
+              </Text>
+              <TouchableOpacity 
+                style={styles.islemButon}
+                onPress={() => router.push({
+                  pathname: '/gider-ekle',
+                  params: {
+                    duzenle: 'true',
+                    id: item.id,
+                    miktar: item.miktar.toString(),
+                    aciklama: item.aciklama,
+                    kategori: item.kategori || GIDER_KATEGORILERI.DIGER,
+                    yaklasan: isYaklasan.toString(),
+                  }
+                })}
+              >
+                <Ionicons name="pencil-outline" size={18} color={tema.textSecondary} />
+              </TouchableOpacity>
+            </View>
+            <Text style={[styles.aciklama, { color: tema.textSecondary }]}>
+              {item.aciklama}
+            </Text>
+            <View style={styles.altBilgi}>
+              <Text style={[styles.tarih, { color: tema.textTertiary }]}>
+                {formatTarih(item.tarih)}
+              </Text>
+              <Text style={[styles.miktar, { color: tema.text }]}>
+                {paraBirimiSembol}{formatNumber(item.miktar.toFixed(2))}
+              </Text>
+            </View>
           </View>
-          <Text style={styles.aciklama}>{item.aciklama}</Text>
-          <Text style={styles.miktar}>₺{formatNumber(item.miktar.toFixed(2))}</Text>
-        </View>
-      </View>
-    </Swipeable>
-  );
+        </Pressable>
+      </Swipeable>
+    );
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
       {/* Üst Kart */}
-      <View style={styles.topCard}>
+      <View style={[styles.topCard, { backgroundColor: tema.cardBackground }]}>
         <View style={styles.topCardHeader}>
-          <Text style={styles.topCardTitle}>Toplam Gider</Text>
+          <Text style={[styles.topCardTitle, { color: tema.text }]}>
+            {t('toplamGider')}
+          </Text>
         </View>
-        <Text style={styles.balanceAmount}>
-          ₺{formatNumber(giderler.reduce((sum, item) => sum + item.miktar, 0).toFixed(2))}
+        <Text style={[styles.balanceAmount, { color: tema.text }]}>
+          {paraBirimiSembol}{formatNumber(giderler.reduce((sum, item) => sum + item.miktar, 0).toFixed(2))}
         </Text>
-        <Text style={styles.balanceChange}>
-          Bu ay eklenen gider sayısı: {giderler.length}
+        <Text style={[styles.balanceChange, { color: tema.textSecondary }]}>
+          {t('buAyEklenenGider')}: {giderler.length}
         </Text>
       </View>
 
       {/* Liste */}
       <View style={styles.transactionCards}>
         <FlatList
-          data={giderler}
+          data={[...giderler, ...yaklasanGiderler]}
           renderItem={renderGider}
           keyExtractor={item => item.id.toString()}
           contentContainerStyle={styles.listContent}
@@ -110,36 +158,10 @@ export default function Gider() {
       {/* Yeni Gider Ekleme Butonu */}
       <View style={styles.floatingButtonContainer}>
         <TouchableOpacity 
-          style={styles.floatingButton}
+          style={[styles.floatingButton, { backgroundColor: tema.danger }]}
           onPress={() => router.push('/gider-ekle')}
         >
           <Ionicons name="add" size={30} color="#fff" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Yeni Tab Bar */}
-      <View style={styles.newTabBar}>
-        <TouchableOpacity 
-          style={styles.tabItem}
-          onPress={() => router.push('/')}
-        >
-          <Ionicons name="home-outline" size={24} color="#666" />
-          <Text style={styles.tabText}>Ana Sayfa</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={styles.tabItem}
-          onPress={() => router.push('/gelir')}
-        >
-          <Ionicons name="arrow-up-circle-outline" size={24} color="#666" />
-          <Text style={styles.tabText}>Gelir</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity 
-          style={[styles.tabItem, styles.activeTab]}
-        >
-          <Ionicons name="arrow-down-circle" size={24} color="#f44336" />
-          <Text style={[styles.tabText, styles.activeTabText]}>Gider</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -271,40 +293,6 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: 8,
   },
-  newTabBar: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    paddingVertical: 10,
-    paddingBottom: 25,
-    borderTopWidth: 1,
-    borderTopColor: '#eee',
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-  },
-  tabItem: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-  },
-  activeTab: {
-    backgroundColor: '#f0f0f0',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 25,
-  },
-  tabText: {
-    fontSize: 12,
-    color: '#666',
-    marginTop: 4,
-  },
-  activeTabText: {
-    color: '#f44336',
-    fontWeight: '500',
-  },
   deleteContainer: {
     marginBottom: 12,
     width: 90,
@@ -321,5 +309,17 @@ const styles = StyleSheet.create({
     fontSize: 11,
     marginTop: 4,
     fontWeight: '500',
+  },
+  yaklasanGider: {
+    opacity: 0.6,
+  },
+  altBilgi: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  tarih: {
+    fontSize: 12,
+    color: '#666',
   },
 }); 

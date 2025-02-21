@@ -1,48 +1,160 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { Ionicons } from '@expo/vector-icons';
+import { useAyarlar } from './context/AyarlarContext';
 
 export default function AnaSayfa() {
   const router = useRouter();
   const pathname = usePathname();
-  const { toplamGelir, toplamGider, formatNumber } = useFinans();
+  const { 
+    toplamGelir, 
+    toplamGider, 
+    formatNumber,
+    gelirler,
+    giderler,
+    GELIR_KATEGORILERI,
+    GIDER_KATEGORILERI
+  } = useFinans();
   const bakiye = toplamGelir - toplamGider;
+  const { 
+    t, 
+    getParaBirimiSembol, 
+    tema,
+    bakiyeGizli,
+    bakiyeGizliDegistir 
+  } = useAyarlar();
+  const paraBirimiSembol = getParaBirimiSembol();
+
+  const gizliMiktar = (miktar) => {
+    return bakiyeGizli ? '******' : `${paraBirimiSembol}${formatNumber(miktar.toFixed(2))}`;
+  };
+
+  // Kategori toplamlarını hesaplayan fonksiyonlar
+  const getGelirKategoriToplam = () => {
+    const kategoriToplam = {};
+    gelirler.forEach(gelir => {
+      const kategoriId = gelir.kategori || GELIR_KATEGORILERI.DIGER;
+      if (kategoriToplam[kategoriId]) {
+        kategoriToplam[kategoriId] += gelir.miktar;
+      } else {
+        kategoriToplam[kategoriId] = gelir.miktar;
+      }
+    });
+    return Object.entries(kategoriToplam).map(([kategori, miktar]) => ({
+      kategori: t(kategori),
+      miktar
+    }));
+  };
+
+  const getGiderKategoriToplam = () => {
+    const kategoriToplam = {};
+    giderler.forEach(gider => {
+      const kategoriId = gider.kategori || GIDER_KATEGORILERI.DIGER;
+      if (kategoriToplam[kategoriId]) {
+        kategoriToplam[kategoriId] += gider.miktar;
+      } else {
+        kategoriToplam[kategoriId] = gider.miktar;
+      }
+    });
+    return Object.entries(kategoriToplam).map(([kategori, miktar]) => ({
+      kategori: t(kategori),
+      miktar
+    }));
+  };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
       {/* Üst Kart */}
-      <View style={styles.topCard}>
+      <View style={[styles.topCard, { backgroundColor: tema.primary }]}>
         <View style={styles.topCardHeader}>
-          <Text style={styles.topCardTitle}>Toplam Bakiye</Text>
+          <Text style={[styles.topCardTitle, { color: '#fff' }]}>
+            {t('toplamBakiye')}
+          </Text>
+          <TouchableOpacity 
+            onPress={() => bakiyeGizliDegistir(!bakiyeGizli)}
+            style={styles.eyeButton}
+          >
+            <Ionicons 
+              name={bakiyeGizli ? "eye-off-outline" : "eye-outline"} 
+              size={24} 
+              color="#fff" 
+            />
+          </TouchableOpacity>
         </View>
-        <Text style={styles.balanceAmount}>₺{formatNumber(bakiye.toFixed(2))}</Text>
-        <Text style={styles.balanceChange}>
-          {bakiye >= 0 ? '↑' : '↓'} Son haftaya göre {formatNumber(Math.abs(bakiye).toFixed(2))}₺ {bakiye >= 0 ? 'artış' : 'azalış'}
+        <Text style={[styles.balanceAmount, { color: '#fff' }]}>
+          {gizliMiktar(bakiye)}
+        </Text>
+        <Text style={[styles.balanceChange, { color: '#fff' }]}>
+          {bakiye >= 0 ? '↑' : '↓'} {t('sonHaftayaGore')} {gizliMiktar(Math.abs(bakiye))} {bakiye >= 0 ? t('artis') : t('azalis')}
         </Text>
       </View>
 
       {/* İşlem Kartları */}
       <View style={styles.transactionCards}>
         <TouchableOpacity 
-          style={[styles.card, styles.incomeCard]}
+          style={[
+            styles.card, 
+            styles.incomeCard,
+            { backgroundColor: tema.cardBackground }
+          ]}
           onPress={() => router.push('/gelir')}
         >
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Gelirler</Text>
-            <Text style={styles.cardAmount}>₺{formatNumber(toplamGelir.toFixed(2))}</Text>
+            <Text style={[styles.cardTitle, { color: tema.text }]}>
+              {t('gelirler')}
+            </Text>
+            <Text style={[styles.cardAmount, { color: tema.text }]}>
+              {gizliMiktar(toplamGelir)}
+            </Text>
           </View>
+          {!bakiyeGizli && (
+            <View style={[styles.categoryList, { borderTopColor: tema.border }]}>
+              {getGelirKategoriToplam().map((item, index) => (
+                <View key={index} style={styles.categoryItem}>
+                  <Text style={[styles.categoryName, { color: tema.textSecondary }]}>
+                    {item.kategori}
+                  </Text>
+                  <Text style={[styles.categoryAmount, { color: tema.text }]}>
+                    {paraBirimiSembol}{formatNumber(item.miktar.toFixed(2))}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
         </TouchableOpacity>
 
         <TouchableOpacity 
-          style={[styles.card, styles.expenseCard]}
+          style={[
+            styles.card, 
+            styles.expenseCard,
+            { backgroundColor: tema.cardBackground }
+          ]}
           onPress={() => router.push('/gider')}
         >
           <View style={styles.cardContent}>
-            <Text style={styles.cardTitle}>Giderler</Text>
-            <Text style={styles.cardAmount}>₺{formatNumber(toplamGider.toFixed(2))}</Text>
+            <Text style={[styles.cardTitle, { color: tema.text }]}>
+              {t('giderler')}
+            </Text>
+            <Text style={[styles.cardAmount, { color: tema.text }]}>
+              {gizliMiktar(toplamGider)}
+            </Text>
           </View>
+          {!bakiyeGizli && (
+            <View style={[styles.categoryList, { borderTopColor: tema.border }]}>
+              {getGiderKategoriToplam().map((item, index) => (
+                <View key={index} style={styles.categoryItem}>
+                  <Text style={[styles.categoryName, { color: tema.textSecondary }]}>
+                    {item.kategori}
+                  </Text>
+                  <Text style={[styles.categoryAmount, { color: tema.text }]}>
+                    {paraBirimiSembol}{formatNumber(item.miktar.toFixed(2))}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          )}
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -122,11 +234,30 @@ const styles = StyleSheet.create({
   },
   cardTitle: {
     fontSize: 16,
-    color: '#333',
   },
   cardAmount: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#333',
+  },
+  eyeButton: {
+    padding: 5,
+  },
+  categoryList: {
+    marginTop: 10,
+    borderTopWidth: 1,
+    paddingTop: 10,
+  },
+  categoryItem: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 4,
+  },
+  categoryName: {
+    fontSize: 12,
+  },
+  categoryAmount: {
+    fontSize: 12,
+    fontWeight: '500',
   },
 }); 

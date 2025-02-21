@@ -7,10 +7,6 @@
     "development": {
       "developmentClient": true,
       "distribution": "internal",
-      "ios": {
-        "simulator": true,
-        "resourceClass": "m1-medium"
-      },
       "android": {
         "gradleCommand": ":app:assembleDebug"
       },
@@ -18,27 +14,33 @@
     },
     "preview": {
       "distribution": "internal",
-      "channel": "preview"
+      "channel": "preview",
+      "android": {
+        "buildType": "apk"
+      },
+      "ios": {
+        "simulator": true
+      }
     },
     "production": {
       "autoIncrement": true,
       "channel": "production",
-      "ios": {
-        "resourceClass": "m1-medium",
-        "buildConfiguration": "Release",
-        "distribution": "store"
-      },
       "android": {
         "buildType": "app-bundle"
+      },
+      "ios": {
+        "resourceClass": "m1-medium",
+        "buildConfiguration": "Release"
       }
     }
   },
   "submit": {
     "production": {
       "ios": {
-        "appleId": "your-apple-id@email.com",
-        "ascAppId": "your-app-store-id",
-        "appleTeamId": "your-team-id"
+        "ascAppId": "6742241888",
+        "appleTeamId": "GQN4W45H29",
+        "appleId": "ardabagce@icloud.com",
+        "language": "tr"
       }
     }
   }
