@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Modal, FlatList } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -15,7 +15,10 @@ export default function AnaSayfa() {
     gelirler,
     giderler,
     GELIR_KATEGORILERI,
-    GIDER_KATEGORILERI
+    GIDER_KATEGORILERI,
+    secilenAy,
+    ayDegistir,
+    aylar
   } = useFinans();
   const bakiye = toplamGelir - toplamGider;
   const { 
@@ -26,6 +29,7 @@ export default function AnaSayfa() {
     bakiyeGizliDegistir 
   } = useAyarlar();
   const paraBirimiSembol = getParaBirimiSembol();
+  const [aySeciciVisible, setAySeciciVisible] = useState(false);
 
   const gizliMiktar = (miktar) => {
     return bakiyeGizli ? '******' : `${paraBirimiSembol}${formatNumber(miktar.toFixed(2))}`;
@@ -66,6 +70,97 @@ export default function AnaSayfa() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
+      {/* Ay Seçici */}
+      <View style={[styles.aySeciciContainer, { backgroundColor: tema.cardBackground }]}>
+        <TouchableOpacity 
+          style={styles.aySeciciButton}
+          onPress={() => setAySeciciVisible(true)}
+        >
+          <View style={styles.aySeciciContent}>
+            <Ionicons 
+              name="calendar-outline" 
+              size={20} 
+              color={tema.primary}
+              style={styles.aySeciciIcon}
+            />
+            <Text style={[styles.aySeciciText, { color: tema.text }]}>
+              {aylar[secilenAy]}
+            </Text>
+            <Ionicons 
+              name="chevron-down-outline" 
+              size={20} 
+              color={tema.textSecondary}
+            />
+          </View>
+        </TouchableOpacity>
+      </View>
+
+      {/* Ay Seçici Modal */}
+      <Modal
+        visible={aySeciciVisible}
+        transparent={true}
+        animationType="fade"
+        onRequestClose={() => setAySeciciVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={[styles.modalContent, { backgroundColor: tema.cardBackground }]}>
+            <View style={styles.modalHeader}>
+              <Text style={[styles.modalTitle, { color: tema.text }]}>
+                {t('aySecin')}
+              </Text>
+              <TouchableOpacity 
+                onPress={() => setAySeciciVisible(false)}
+                style={styles.modalCloseButton}
+              >
+                <Ionicons 
+                  name="close" 
+                  size={24} 
+                  color={tema.textSecondary} 
+                />
+              </TouchableOpacity>
+            </View>
+            <FlatList
+              data={Object.entries(aylar)}
+              keyExtractor={([key]) => key}
+              showsVerticalScrollIndicator={false}
+              renderItem={({ item: [key, value] }) => (
+                <TouchableOpacity
+                  style={[
+                    styles.ayItem,
+                    { borderColor: tema.border },
+                    secilenAy === key && { 
+                      backgroundColor: tema.primaryLight,
+                      borderColor: tema.primary 
+                    }
+                  ]}
+                  onPress={() => {
+                    ayDegistir(key);
+                    setAySeciciVisible(false);
+                  }}
+                >
+                  <View style={styles.ayItemContent}>
+                    <Text style={[
+                      styles.ayItemText,
+                      { color: tema.text },
+                      secilenAy === key && { color: tema.primary }
+                    ]}>
+                      {value}
+                    </Text>
+                    {secilenAy === key && (
+                      <Ionicons 
+                        name="checkmark-circle" 
+                        size={20} 
+                        color={tema.primary} 
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              )}
+            />
+          </View>
+        </View>
+      </Modal>
+
       {/* Üst Kart */}
       <View style={[styles.topCard, { backgroundColor: tema.primary }]}>
         <View style={styles.topCardHeader}>
@@ -259,5 +354,73 @@ const styles = StyleSheet.create({
   categoryAmount: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  aySeciciContainer: {
+    margin: 16,
+    borderRadius: 12,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
+  },
+  aySeciciButton: {
+    padding: 16,
+  },
+  aySeciciContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  aySeciciIcon: {
+    marginRight: 8,
+  },
+  aySeciciText: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginRight: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    borderRadius: 20,
+    maxHeight: '80%',
+  },
+  modalHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: 'rgba(0, 0, 0, 0.1)',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  modalCloseButton: {
+    padding: 4,
+  },
+  ayItem: {
+    padding: 16,
+    borderWidth: 1,
+    borderRadius: 12,
+    marginHorizontal: 16,
+    marginVertical: 6,
+  },
+  ayItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  ayItemText: {
+    fontSize: 16,
   },
 }); 

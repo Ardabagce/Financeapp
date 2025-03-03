@@ -85,6 +85,26 @@ export const translations = {
     copyright: '© 2024 Arda Bağçe. Tüm hakları saklıdır.',
 
     karanlikMod: 'Karanlık Mod',
+
+    aySecin: 'Ay Seçin',
+
+    guncelTarih: 'Güncel Tarih',
+    guncelTarihKullaniliyor: 'Güncel tarih kullanılıyor',
+    tamam: 'Tamam',
+
+    tumZamanlar: 'Tüm Zamanlar',
+    ay_01: 'Ocak',
+    ay_02: 'Şubat',
+    ay_03: 'Mart',
+    ay_04: 'Nisan',
+    ay_05: 'Mayıs',
+    ay_06: 'Haziran',
+    ay_07: 'Temmuz',
+    ay_08: 'Ağustos',
+    ay_09: 'Eylül',
+    ay_10: 'Ekim',
+    ay_11: 'Kasım',
+    ay_12: 'Aralık',
   },
   en: {
     // Home Page
@@ -172,6 +192,26 @@ export const translations = {
     copyright: '© 2024 Arda Bağçe. All rights reserved.',
 
     karanlikMod: 'Dark Mode',
+
+    aySecin: 'Select Month',
+
+    guncelTarih: 'Current Date',
+    guncelTarihKullaniliyor: 'Using current date',
+    tamam: 'OK',
+
+    tumZamanlar: 'All Time',
+    ay_01: 'January',
+    ay_02: 'February',
+    ay_03: 'March',
+    ay_04: 'April',
+    ay_05: 'May',
+    ay_06: 'June',
+    ay_07: 'July',
+    ay_08: 'August',
+    ay_09: 'September',
+    ay_10: 'October',
+    ay_11: 'November',
+    ay_12: 'December',
   },
   de: {
     // Ana Sayfa
@@ -259,6 +299,26 @@ export const translations = {
     copyright: '© 2024 Arda Bağçe. Alle Rechte vorbehalten.',
 
     karanlikMod: 'Dunkelmodus',
+
+    aySecin: 'Monat auswählen',
+
+    guncelTarih: 'Aktuelles Datum',
+    guncelTarihKullaniliyor: 'Verwendet aktuelles Datum',
+    tamam: 'OK',
+
+    tumZamanlar: 'Alle Zeit',
+    ay_01: 'Januar',
+    ay_02: 'Februar',
+    ay_03: 'März',
+    ay_04: 'April',
+    ay_05: 'Mai',
+    ay_06: 'Juni',
+    ay_07: 'Juli',
+    ay_08: 'August',
+    ay_09: 'September',
+    ay_10: 'Oktober',
+    ay_11: 'November',
+    ay_12: 'Dezember',
   }
 };
 

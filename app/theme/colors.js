@@ -21,6 +21,8 @@ export const lightTheme = {
   tabBar: '#ffffff',
   tabBarBorder: '#eeeeee',
   tabBarInactive: '#666666',
+  
+  primaryLight: '#F0EDFF', // Ana rengin açık tonu
 };
 
 export const darkTheme = {
@@ -46,4 +48,6 @@ export const darkTheme = {
   tabBar: '#1a1a1a',
   tabBarBorder: '#333333',
   tabBarInactive: '#b3b3b3',
+  
+  primaryLight: '#2D2B43', // Ana rengin koyu tonu
 }; 

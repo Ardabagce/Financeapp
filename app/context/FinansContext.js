@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect, useCallback, useMemo } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAyarlar } from './AyarlarContext';
 
 const FinansContext = createContext();
 
@@ -28,6 +29,25 @@ function FinansProvider({ children }) {
   const [giderler, setGiderler] = useState([]);
   const [yaklasanGelirler, setYaklasanGelirler] = useState([]);
   const [yaklasanGiderler, setYaklasanGiderler] = useState([]);
+  const [secilenAy, setSecilenAy] = useState('all');
+  const { t } = useAyarlar();
+
+  // Ayları t() fonksiyonu ile çevirilmiş şekilde oluştur
+  const aylar = useMemo(() => ({
+    'all': t('tumZamanlar'),
+    '2025-01': `${t('ay_01')} 2025`,
+    '2025-02': `${t('ay_02')} 2025`,
+    '2025-03': `${t('ay_03')} 2025`,
+    '2025-04': `${t('ay_04')} 2025`,
+    '2025-05': `${t('ay_05')} 2025`,
+    '2025-06': `${t('ay_06')} 2025`,
+    '2025-07': `${t('ay_07')} 2025`,
+    '2025-08': `${t('ay_08')} 2025`,
+    '2025-09': `${t('ay_09')} 2025`,
+    '2025-10': `${t('ay_10')} 2025`,
+    '2025-11': `${t('ay_11')} 2025`,
+    '2025-12': `${t('ay_12')} 2025`,
+  }), [t]);
 
   useEffect(() => {
     // Uygulama başladığında verileri yükle
@@ -217,21 +237,44 @@ function FinansProvider({ children }) {
     return decimal ? `${formattedWhole},${decimal}` : formattedWhole;
   };
 
-  // Hesaplamaları useMemo ile optimize edelim
+  // Filtrelenmiş verileri hesapla
+  const filtreliGelirler = useMemo(() => {
+    if (secilenAy === 'all') return gelirler;
+    return gelirler.filter(gelir => {
+      const gelirTarihi = new Date(gelir.tarih);
+      const ayStr = `${gelirTarihi.getFullYear()}-${String(gelirTarihi.getMonth() + 1).padStart(2, '0')}`;
+      return ayStr === secilenAy;
+    });
+  }, [gelirler, secilenAy]);
+
+  const filtreliGiderler = useMemo(() => {
+    if (secilenAy === 'all') return giderler;
+    return giderler.filter(gider => {
+      const giderTarihi = new Date(gider.tarih);
+      const ayStr = `${giderTarihi.getFullYear()}-${String(giderTarihi.getMonth() + 1).padStart(2, '0')}`;
+      return ayStr === secilenAy;
+    });
+  }, [giderler, secilenAy]);
+
+  // Filtrelenmiş toplamları hesapla
   const toplamGelir = useMemo(() => 
-    gelirler.reduce((sum, item) => sum + item.miktar, 0),
-    [gelirler]
+    filtreliGelirler.reduce((sum, item) => sum + item.miktar, 0),
+    [filtreliGelirler]
   );
 
   const toplamGider = useMemo(() => 
-    giderler.reduce((sum, item) => sum + item.miktar, 0),
-    [giderler]
+    filtreliGiderler.reduce((sum, item) => sum + item.miktar, 0),
+    [filtreliGiderler]
   );
 
-  // Context değerini memoize edelim
+  const ayDegistir = useCallback((yeniAy) => {
+    setSecilenAy(yeniAy);
+  }, []);
+
+  // Context değerini güncelle
   const contextValue = useMemo(() => ({
-    gelirler,
-    giderler,
+    gelirler: filtreliGelirler,
+    giderler: filtreliGiderler,
     yaklasanGelirler,
     yaklasanGiderler,
     gelirEkle,
@@ -250,14 +293,17 @@ function FinansProvider({ children }) {
     toplamGider,
     formatNumber,
     GELIR_KATEGORILERI,
-    GIDER_KATEGORILERI
+    GIDER_KATEGORILERI,
+    secilenAy,
+    ayDegistir,
+    aylar,
   }), [
-    gelirler,
-    giderler,
-    yaklasanGelirler,
-    yaklasanGiderler,
+    filtreliGelirler,
+    filtreliGiderler,
     toplamGelir,
-    toplamGider
+    toplamGider,
+    secilenAy,
+    aylar,
   ]);
 
   return (

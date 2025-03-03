@@ -11,8 +11,10 @@ import {
   Alert,
   Switch,
   Keyboard,
-  SafeAreaView
+  SafeAreaView,
+  Modal,
 } from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { useAyarlar } from './context/AyarlarContext';
@@ -22,6 +24,9 @@ export default function GelirEkle() {
   const [aciklama, setAciklama] = useState('');
   const [kategori, setKategori] = useState('');
   const [yaklasan, setYaklasan] = useState(false);
+  const [guncelTarih, setGuncelTarih] = useState(true);
+  const [tarih, setTarih] = useState(new Date());
+  const [tarihPickerVisible, setTarihPickerVisible] = useState(false);
   const router = useRouter();
   const { gelirEkle, gelirGuncelle, gelirSil, gelirler, yaklasanGelirEkle, GELIR_KATEGORILERI } = useFinans();
   const params = useLocalSearchParams();
@@ -49,6 +54,19 @@ export default function GelirEkle() {
     }
   }, [GELIR_KATEGORILERI]);
 
+  const formatTarih = (date) => {
+    return date.toLocaleDateString('tr-TR');
+  };
+
+  const tarihDegistir = (event, secilenTarih) => {
+    if (Platform.OS === 'android') {
+      setTarihPickerVisible(false);
+    }
+    if (secilenTarih) {
+      setTarih(secilenTarih);
+    }
+  };
+
   const gelirKaydet = async () => {
     const temizMiktar = miktar.replace(',', '.');
     
@@ -68,7 +86,7 @@ export default function GelirEkle() {
           miktar: parseFloat(temizMiktar),
           aciklama,
           kategori,
-          tarih: new Date(),
+          tarih: guncelTarih ? new Date() : tarih,
         });
       } else {
         if (yaklasan) {
@@ -76,14 +94,14 @@ export default function GelirEkle() {
             miktar: parseFloat(temizMiktar),
             aciklama,
             kategori,
-            tarih: new Date(),
+            tarih: guncelTarih ? new Date() : tarih,
           });
         } else {
           await gelirEkle({
             miktar: parseFloat(temizMiktar),
             aciklama,
             kategori,
-            tarih: new Date(),
+            tarih: guncelTarih ? new Date() : tarih,
           });
         }
       }
@@ -225,6 +243,28 @@ export default function GelirEkle() {
               />
             </View>
 
+            <View style={[styles.switchContainer, { backgroundColor: tema.cardBackground }]}>
+              <View style={styles.switchInfo}>
+                <Text style={[styles.switchLabel, { color: tema.success }]}>
+                  {t('guncelTarih')}
+                </Text>
+                <Text style={[styles.switchDescription, { color: tema.textSecondary }]}>
+                  {guncelTarih ? t('guncelTarihKullaniliyor') : formatTarih(tarih)}
+                </Text>
+              </View>
+              <Switch
+                value={guncelTarih}
+                onValueChange={(value) => {
+                  setGuncelTarih(value);
+                  if (!value) {
+                    setTarihPickerVisible(true);
+                  }
+                }}
+                trackColor={{ false: tema.border, true: tema.success }}
+                thumbColor={guncelTarih ? tema.success : tema.cardBackground}
+              />
+            </View>
+
             <TouchableOpacity 
               style={[styles.submitButton, { backgroundColor: tema.success }]}
               onPress={gelirKaydet}
@@ -236,6 +276,79 @@ export default function GelirEkle() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
+
+      {/* Tarih Seçici Modal */}
+      {Platform.OS === 'android' && tarihPickerVisible && (
+        <Modal
+          transparent={true}
+          animationType="fade"
+          visible={tarihPickerVisible}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: tema.cardBackground }]}>
+              <DateTimePicker
+                value={tarih}
+                mode="date"
+                display="spinner"
+                onChange={(event, date) => {
+                  if (date) setTarih(date);
+                }}
+                textColor={tema.text}
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: tema.danger }]}
+                  onPress={() => setTarihPickerVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>{t('iptal')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: tema.success }]}
+                  onPress={() => setTarihPickerVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>{t('tamam')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
+
+      {Platform.OS === 'ios' && tarihPickerVisible && (
+        <Modal
+          transparent={true}
+          animationType="slide"
+          visible={tarihPickerVisible}
+        >
+          <View style={styles.modalOverlay}>
+            <View style={[styles.modalContent, { backgroundColor: tema.cardBackground }]}>
+              <DateTimePicker
+                value={tarih}
+                mode="date"
+                display="spinner"
+                onChange={(event, date) => {
+                  if (date) setTarih(date);
+                }}
+                textColor={tema.text}
+              />
+              <View style={styles.modalButtons}>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: tema.danger }]}
+                  onPress={() => setTarihPickerVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>{t('iptal')}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[styles.modalButton, { backgroundColor: tema.success }]}
+                  onPress={() => setTarihPickerVisible(false)}
+                >
+                  <Text style={styles.modalButtonText}>{t('tamam')}</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </View>
+        </Modal>
+      )}
     </SafeAreaView>
   );
 }
@@ -327,6 +440,33 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   submitButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    padding: 20,
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
+  },
+  modalButton: {
+    flex: 1,
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginHorizontal: 5,
+  },
+  modalButtonText: {
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',

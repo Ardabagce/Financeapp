@@ -29,7 +29,7 @@
         "buildType": "app-bundle"
       },
       "ios": {
-        "resourceClass": "m1-medium",
+        "resourceClass": "m-medium",
         "buildConfiguration": "Release"
       }
     }
@@ -37,9 +37,9 @@
   "submit": {
     "production": {
       "ios": {
+        "appleId": "ardabagce@icloud.com",
         "ascAppId": "6742241888",
         "appleTeamId": "GQN4W45H29",
-        "appleId": "ardabagce@icloud.com",
         "language": "tr"
       }
     }
