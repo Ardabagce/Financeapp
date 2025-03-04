@@ -53,11 +53,11 @@ export const translations = {
     dilSecenekleri: 'Dil Seçenekleri',
     paraBirimi: 'Para Birimi',
 
-    // Para Birimleri - Yeni çeviriler
-    try: 'Türk Lira',
-    usd: 'Amerikan Dolar',
+    // Para Birimleri
+    try: 'Türk Lirası',
+    usd: 'Amerikan Doları',
     eur: 'Euro',
-    gbp: 'İngiliz Sterlin',
+    gbp: 'İngiliz Sterlini',
 
     // İstatistikler
     toplamGelir: 'Toplam',
@@ -107,8 +107,8 @@ export const translations = {
     ay_12: 'Aralık',
 
     bildirimler: 'Bildirimler',
-    bildirimTesti: 'Test Bildirimi Gönder',
 
+    // Seyahat Planlama
     seyahatPlanla: 'Seyahat Planla',
     seyahatBilgileri: 'Seyahat Bilgileri',
     seyahatAdi: 'Seyahat Adı',
@@ -116,7 +116,6 @@ export const translations = {
     bitisTarihi: 'Bitiş Tarihi',
     planlananButce: 'Planlanan Bütçe',
     notlar: 'Notlar',
-    kaydet: 'Kaydet',
     seyahatNotlari: 'Seyahat notlarınız...',
     ornekSeyahatAdi: 'Örn: Yaz Tatili',
     ornekButce: 'Örn: 5000',
@@ -125,7 +124,7 @@ export const translations = {
     aile: 'Aile',
     diger: 'Diğer',
 
-    // Seyahat sayfası çevirileri
+    // Seyahat sayfası
     hotels: 'Oteller',
     flights: 'Uçuşlar',
     cars: 'Arabalar',
@@ -144,6 +143,83 @@ export const translations = {
     friends: 'Arkadaşlar',
     trips: 'Seyahatler',
     help: 'Yardım',
+
+    // Seyahat Planlama
+    seyahat_planla: 'Seyahat Planla',
+    toplam_maliyet: 'Toplam Maliyet',
+    harcama_kategorileri: 'Harcama Kategorileri',
+    kategori_secim_aciklama: 'Kategori seçerek harcamalarınızı girin',
+    kategori_toplami: 'Kategori Toplamı',
+    seyahat_planini_kaydet: 'Seyahat Planını Kaydet',
+    seyahat_planini_guncelle: 'Seyahati Güncelle',
+    baslangic_tarihi_sec: 'Başlangıç Tarihi Seç',
+    bitis_tarihi_sec: 'Bitiş Tarihi Seç',
+
+    // Seyahat Kategorileri
+    konaklama: 'Konaklama',
+    ucuslar: 'Uçuşlar',
+    arac: 'Araç',
+    yemek: 'Yemek',
+    aktiviteler: 'Aktiviteler',
+    alisveris: 'Alışveriş',
+    ulasim: 'Ulaşım',
+    saglik: 'Sağlık',
+    diger: 'Diğer',
+
+    // Alt Kategoriler - Konaklama
+    otel_ucreti: 'Otel Ücreti',
+    kahvalti_ucreti: 'Kahvaltı/Yemek Ücreti',
+    ekstra_hizmetler: 'Ekstra Hizmetler',
+
+    // Alt Kategoriler - Uçuşlar
+    ucak_bileti: 'Uçak Bileti',
+    havalimani_transfer: 'Havalimanı Transfer',
+    bagaj_ucreti: 'Bagaj Ücreti',
+
+    // Alt Kategoriler - Araç
+    arac_kiralama: 'Araç Kiralama',
+    yakit_gideri: 'Yakıt Gideri',
+    otopark_ucreti: 'Otopark Ücreti',
+
+    // Alt Kategoriler - Yemek
+    gunluk_yemek: 'Günlük Yemek',
+    restoran_harcamalari: 'Restoran Harcamaları',
+    atistirmaliklar: 'Atıştırmalıklar',
+
+    // Alt Kategoriler - Aktiviteler
+    muze_ve_turlar: 'Müze ve Turlar',
+    eglence_aktiviteleri: 'Eğlence Aktiviteleri',
+    spor_etkinlikleri: 'Spor Etkinlikleri',
+
+    // Alt Kategoriler - Alışveriş
+    hediyelik_esya: 'Hediyelik Eşya',
+    kisisel_alisveris: 'Kişisel Alışveriş',
+    diger_alisveris: 'Diğer Alışveriş',
+
+    // Alt Kategoriler - Ulaşım
+    taksi_ucretleri: 'Taksi Ücretleri',
+    toplu_tasima: 'Toplu Taşıma',
+    diger_ulasim: 'Diğer Ulaşım',
+
+    // Alt Kategoriler - Sağlık
+    seyahat_sigortasi: 'Seyahat Sigortası',
+    ilac_giderleri: 'İlaç Giderleri',
+    diger_saglik: 'Diğer Sağlık',
+
+    // Alt Kategoriler - Diğer
+    gunluk_harclik: 'Günlük Harçlık',
+    beklenmeyen_giderler: 'Beklenmeyen Giderler',
+    diger_harcamalar: 'Diğer Harcamalar',
+
+    // Seyahat Planları
+    planlanmisSeyahatler: 'Planlanan Seyahatler',
+    seyahatEkle: 'Seyahat Ekle',
+    seyahatDuzenle: 'Seyahati Düzenle',
+    seyahatSil: 'Seyahat Sil',
+    seyahatSilOnay: 'Bu seyahati silmek istediğinize emin misiniz?',
+    seyahatKonum: 'Seyahat Konumu',
+    seyahatTarih: 'Seyahat Tarihi',
+    seyahatMaliyet: 'Toplam Maliyet',
   },
   en: {
     // Home Page
@@ -253,7 +329,6 @@ export const translations = {
     ay_12: 'December',
 
     bildirimler: 'Notifications',
-    bildirimTesti: 'Send Test Notification',
 
     seyahatPlanla: 'Plan Travel',
     seyahatBilgileri: 'Travel Information',
@@ -262,7 +337,6 @@ export const translations = {
     bitisTarihi: 'End Date',
     planlananButce: 'Planned Budget',
     notlar: 'Notes',
-    kaydet: 'Save',
     seyahatNotlari: 'Your travel notes...',
     ornekSeyahatAdi: 'Ex: Summer Vacation',
     ornekButce: 'Ex: 5000',
@@ -290,6 +364,99 @@ export const translations = {
     friends: 'Friends',
     trips: 'Trips',
     help: 'Help',
+
+    // Travel Planning
+    seyahat_planla: 'Plan Travel',
+    toplam_maliyet: 'Total Cost',
+    harcama_kategorileri: 'Expense Categories',
+    kategori_secim_aciklama: 'Select a category to enter your expenses',
+    kategori_toplami: 'Category Total',
+    seyahat_planini_kaydet: 'Save Travel Plan',
+    seyahat_planini_guncelle: 'Update Travel Plan',
+    baslangic_tarihi_sec: 'Select Start Date',
+    bitis_tarihi_sec: 'Select End Date',
+    tamam: 'OK',
+    iptal: 'Cancel',
+
+    // Categories
+    konaklama: 'Accommodation',
+    ucuslar: 'Flights',
+    arac: 'Vehicle',
+    yemek: 'Food',
+    aktiviteler: 'Activities',
+    alisveris: 'Shopping',
+    ulasim: 'Transportation',
+    saglik: 'Health',
+    diger: 'Other',
+
+    // Sub Categories - Accommodation
+    otel_ucreti: 'Hotel Fee',
+    kahvalti_ucreti: 'Breakfast/Meal Fee',
+    ekstra_hizmetler: 'Extra Services',
+
+    // Sub Categories - Flights
+    ucak_bileti: 'Plane Ticket',
+    havalimani_transfer: 'Airport Transfer',
+    bagaj_ucreti: 'Baggage Fee',
+
+    // Sub Categories - Vehicle
+    arac_kiralama: 'Car Rental',
+    yakit_gideri: 'Fuel Cost',
+    otopark_ucreti: 'Parking Fee',
+
+    // Sub Categories - Food
+    gunluk_yemek: 'Daily Meals',
+    restoran_harcamalari: 'Restaurant Expenses',
+    atistirmaliklar: 'Snacks',
+
+    // Sub Categories - Activities
+    muze_ve_turlar: 'Museums and Tours',
+    eglence_aktiviteleri: 'Entertainment Activities',
+    spor_etkinlikleri: 'Sports Events',
+
+    // Sub Categories - Shopping
+    hediyelik_esya: 'Souvenirs',
+    kisisel_alisveris: 'Personal Shopping',
+    diger_alisveris: 'Other Shopping',
+
+    // Sub Categories - Transportation
+    taksi_ucretleri: 'Taxi Fares',
+    toplu_tasima: 'Public Transport',
+    diger_ulasim: 'Other Transport',
+
+    // Sub Categories - Health
+    seyahat_sigortasi: 'Travel Insurance',
+    ilac_giderleri: 'Medicine Expenses',
+    diger_saglik: 'Other Health',
+
+    // Sub Categories - Other
+    gunluk_harclik: 'Daily Allowance',
+    beklenmeyen_giderler: 'Unexpected Expenses',
+    diger_harcamalar: 'Other Expenses',
+
+    // Date related translations
+    baslangicTarihi: 'Start Date',
+    bitisTarihi: 'End Date',
+    baslangic_tarihi_sec: 'Select Start Date',
+    bitis_tarihi_sec: 'Select End Date',
+    tarih_sec: 'Select Date',
+    tarih_secimi: 'Date Selection',
+    tarih_onay: 'Confirm Date',
+    tarih_iptal: 'Cancel',
+    tarih_tamam: 'OK',
+    tarih_gun: 'Day',
+    tarih_ay: 'Month',
+    tarih_yil: 'Year',
+
+    // Travel Plans
+    planlanmisSeyahatler: 'Planned Trips',
+    seyahatEkle: 'Add Trip',
+    seyahatDuzenle: 'Edit Trip',
+    seyahatSil: 'Delete Trip',
+    seyahatSilOnay: 'Are you sure you want to delete this trip?',
+    seyahatKonum: 'Trip Location',
+    seyahatTarih: 'Trip Date',
+    seyahatMaliyet: 'Total Cost',
   },
   de: {
     // Ana Sayfa
@@ -398,7 +565,145 @@ export const translations = {
     ay_11: 'November',
     ay_12: 'Dezember',
 
+    bildirimler: 'Benachrichtigungen',
+
     seyahatPlanla: 'Reiseplanen',
+    seyahatBilgileri: 'Reiseinformationen',
+    seyahatAdi: 'Reisename',
+    planlananButce: 'Geplantes Budget',
+    notlar: 'Notizen',
+    seyahatNotlari: 'Ihre Reisenotizen...',
+    ornekSeyahatAdi: 'z.B.: Sommerurlaub',
+    ornekButce: 'z.B.: 5000',
+    tatil: 'Urlaub',
+    is: 'Geschäft',
+    aile: 'Familie',
+
+    // Reiseplanung
+    seyahat_planla: 'Reise planen',
+    toplam_maliyet: 'Gesamtkosten',
+    harcama_kategorileri: 'Ausgabenkategorien',
+    kategori_secim_aciklama: 'Wählen Sie eine Kategorie aus, um Ihre Ausgaben einzugeben',
+    kategori_toplami: 'Kategorie Gesamt',
+    seyahat_planini_kaydet: 'Reiseplan speichern',
+    seyahat_planini_guncelle: 'Reiseplan aktualisieren',
+    baslangic_tarihi_sec: 'Startdatum auswählen',
+    bitis_tarihi_sec: 'Enddatum auswählen',
+
+    // Kategorien
+    konaklama: 'Unterkunft',
+    ucuslar: 'Flüge',
+    arac: 'Fahrzeug',
+    yemek: 'Essen',
+    aktiviteler: 'Aktivitäten',
+    alisveris: 'Einkaufen',
+    ulasim: 'Transport',
+    saglik: 'Gesundheit',
+    diger: 'Sonstiges',
+
+    // Unterkategorien - Unterkunft
+    otel_ucreti: 'Hotelgebühr',
+    kahvalti_ucreti: 'Frühstück/Mahlzeitengebühr',
+    ekstra_hizmetler: 'Zusatzleistungen',
+
+    // Unterkategorien - Flüge
+    ucak_bileti: 'Flugticket',
+    havalimani_transfer: 'Flughafentransfer',
+    bagaj_ucreti: 'Gepäckgebühr',
+
+    // Unterkategorien - Fahrzeug
+    arac_kiralama: 'Autovermietung',
+    yakit_gideri: 'Kraftstoffkosten',
+    otopark_ucreti: 'Parkgebühr',
+
+    // Unterkategorien - Essen
+    gunluk_yemek: 'Tägliche Mahlzeiten',
+    restoran_harcamalari: 'Restaurantausgaben',
+    atistirmaliklar: 'Snacks',
+
+    // Unterkategorien - Aktivitäten
+    muze_ve_turlar: 'Museen und Touren',
+    eglence_aktiviteleri: 'Unterhaltungsaktivitäten',
+    spor_etkinlikleri: 'Sportveranstaltungen',
+
+    // Unterkategorien - Einkaufen
+    hediyelik_esya: 'Souvenirs',
+    kisisel_alisveris: 'Persönlicher Einkauf',
+    diger_alisveris: 'Sonstiger Einkauf',
+
+    // Unterkategorien - Transport
+    taksi_ucretleri: 'Taxigebühren',
+    toplu_tasima: 'Öffentlicher Verkehr',
+    diger_ulasim: 'Sonstiger Transport',
+
+    // Unterkategorien - Gesundheit
+    seyahat_sigortasi: 'Reiseversicherung',
+    ilac_giderleri: 'Medikamentenkosten',
+    diger_saglik: 'Sonstige Gesundheit',
+
+    // Unterkategorien - Sonstiges
+    gunluk_harclik: 'Tagesgeld',
+    beklenmeyen_giderler: 'Unerwartete Ausgaben',
+    diger_harcamalar: 'Sonstige Ausgaben',
+
+    // Reise Informationen
+    seyahatBilgileri: 'Reiseinformationen',
+    seyahatAdi: 'Reisename',
+    planlananButce: 'Geplantes Budget',
+    notlar: 'Notizen',
+    seyahatNotlari: 'Ihre Reisenotizen...',
+    ornekSeyahatAdi: 'z.B.: Sommerurlaub',
+    ornekButce: 'z.B.: 5000',
+    tatil: 'Urlaub',
+    is: 'Geschäft',
+    aile: 'Familie',
+
+    // Benachrichtigungen
+    bildirimler: 'Benachrichtigungen',
+
+    // Datum bezogene Übersetzungen
+    baslangicTarihi: 'Startdatum',
+    bitisTarihi: 'Enddatum',
+    baslangic_tarihi_sec: 'Startdatum auswählen',
+    bitis_tarihi_sec: 'Enddatum auswählen',
+    tarih_sec: 'Datum auswählen',
+    tarih_secimi: 'Datumsauswahl',
+    tarih_onay: 'Datum bestätigen',
+    tarih_iptal: 'Abbrechen',
+    tarih_tamam: 'OK',
+    tarih_gun: 'Tag',
+    tarih_ay: 'Monat',
+    tarih_yil: 'Jahr',
+
+    // Seyahat sayfası çevirileri
+    hotels: 'Hotels',
+    flights: 'Flüge',
+    cars: 'Autos',
+    homes: 'Unterkünfte',
+    invite: 'Einladen',
+    deals: 'Angebote',
+    freeze: 'Einfrieren',
+    wallet: 'Geldbörse',
+    rewards: 'Belohnungen',
+    continueSearch: 'Suche fortsetzen',
+    nearbyHotels: 'Hotels in der Nähe',
+    exclusiveHotelDeals: 'Exklusive Hotelangebote in der Nähe',
+    inviteFriends: 'Freunde einladen, 100€ verdienen',
+    searchDestination: 'Wohin möchten Sie reisen?',
+    home: 'Startseite',
+    friends: 'Freunde',
+    trips: 'Reisen',
+    help: 'Hilfe',
+
+    // Reisepläne
+    planlanmisSeyahatler: 'Geplante Reisen',
+    seyahatEkle: 'Reise hinzufügen',
+    seyahatDuzenle: 'Reise bearbeiten',
+    seyahatSil: 'Reise löschen',
+    seyahatSilOnay: 'Sind Sie sicher, dass Sie diese Reise löschen möchten?',
+    seyahatKonum: 'Reiseziel',
+    seyahatTarih: 'Reisedatum',
+    seyahatMaliyet: 'Gesamtkosten',
   }
 };
 
