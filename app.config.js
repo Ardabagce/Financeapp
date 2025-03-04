@@ -10,5 +10,12 @@ module.exports = {
     eas: {
       projectId: 'bfd353b2-5a65-4be7-b4be-89bcf7cae651'
     }
+  },
+  android: {
+    package: "com.ardabagce.GelirGider",
+    adaptiveIcon: {
+      foregroundImage: "./assets/adaptive-icon.png",
+      backgroundColor: "#ffffff"
+    }
   }
 }; 

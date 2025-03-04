@@ -18,6 +18,7 @@ import DateTimePicker from '@react-native-community/datetimepicker';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { useAyarlar } from './context/AyarlarContext';
+import { useBildirim } from './context/BildirimContext';
 
 export default function GelirEkle() {
   const [miktar, setMiktar] = useState('');
@@ -32,6 +33,7 @@ export default function GelirEkle() {
   const params = useLocalSearchParams();
   const { t, getParaBirimiSembol, tema } = useAyarlar();
   const paraBirimiSembol = getParaBirimiSembol();
+  const { planlaYaklasanBildirim } = useBildirim();
 
   const kategoriler = [
     { id: GELIR_KATEGORILERI.MAAS, ad: t(GELIR_KATEGORILERI.MAAS) },
@@ -81,30 +83,41 @@ export default function GelirEkle() {
     }
 
     try {
+      const miktarSayi = parseFloat(temizMiktar);
+      const yeniTarih = guncelTarih ? new Date() : tarih;
+
       if (params.duzenle === 'true') {
         await gelirGuncelle(Number(params.id), {
-          miktar: parseFloat(temizMiktar),
+          miktar: miktarSayi,
           aciklama,
           kategori,
-          tarih: guncelTarih ? new Date() : tarih,
+          tarih: yeniTarih,
         });
       } else {
         if (yaklasan) {
           await yaklasanGelirEkle({
-            miktar: parseFloat(temizMiktar),
+            miktar: miktarSayi,
             aciklama,
             kategori,
-            tarih: guncelTarih ? new Date() : tarih,
+            tarih: yeniTarih,
+          });
+
+          // Yaklaşan gelir için bildirim planla
+          await planlaYaklasanBildirim('gelir', {
+            miktar: miktarSayi,
+            aciklama,
+            tarih: yeniTarih
           });
         } else {
           await gelirEkle({
-            miktar: parseFloat(temizMiktar),
+            miktar: miktarSayi,
             aciklama,
             kategori,
-            tarih: guncelTarih ? new Date() : tarih,
+            tarih: yeniTarih,
           });
         }
       }
+
       router.back();
     } catch (error) {
       Alert.alert('Hata', 'Bir hata oluştu');

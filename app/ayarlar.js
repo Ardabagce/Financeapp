@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { 
   StyleSheet, 
   View, 
@@ -6,11 +6,14 @@ import {
   TouchableOpacity, 
   ScrollView,
   SafeAreaView,
-  Switch
+  Switch,
+  Alert
 } from 'react-native';
 import { useAyarlar } from './context/AyarlarContext';
+import { useBildirim } from './context/BildirimContext';
 import { Ionicons } from '@expo/vector-icons';
 import Constants from 'expo-constants';
+import * as Notifications from 'expo-notifications';
 
 export default function Ayarlar() {
   const { 
@@ -25,6 +28,48 @@ export default function Ayarlar() {
     tema,
     t
   } = useAyarlar();
+  const { testBildirimiGonder } = useBildirim();
+  const [bildirimIzni, setBildirimIzni] = useState(false);
+
+  useEffect(() => {
+    // Bildirim izinlerini kontrol et
+    async function izinKontrol() {
+      const { status } = await Notifications.getPermissionsAsync();
+      setBildirimIzni(status === 'granted');
+    }
+    izinKontrol();
+  }, []);
+
+  const bildirimIzniIste = async () => {
+    const { status } = await Notifications.requestPermissionsAsync();
+    setBildirimIzni(status === 'granted');
+    
+    if (status === 'granted') {
+      // İzin alındı, test bildirimi gönder
+      testBildirimiGonder();
+      Alert.alert(
+        dil === 'tr' ? 'Bildirim Gönderildi' : 'Notification Sent',
+        dil === 'tr' ? 'Test bildirimi gönderildi. Lütfen bildirim gelip gelmediğini kontrol edin.' : 
+                      'Test notification sent. Please check if you received it.'
+      );
+    } else {
+      // İzin alınamadı
+      Alert.alert(
+        dil === 'tr' ? 'Bildirim İzni Gerekli' : 'Notification Permission Required',
+        dil === 'tr' ? 'Bildirimleri göndermek için izin gerekiyor. Lütfen ayarlardan izin verin.' : 
+                      'Permission is required to send notifications. Please grant permission in settings.'
+      );
+    }
+  };
+
+  const testBildirimiGonderVeOnay = () => {
+    testBildirimiGonder();
+    Alert.alert(
+      dil === 'tr' ? 'Bildirim Gönderildi' : 'Notification Sent',
+      dil === 'tr' ? 'Test bildirimi gönderildi. Lütfen bildirim gelip gelmediğini kontrol edin.' : 
+                    'Test notification sent. Please check if you received it.'
+    );
+  };
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
@@ -103,6 +148,38 @@ export default function Ayarlar() {
             thumbColor={karanlikMod ? tema.primary : '#f4f3f4'}
             ios_backgroundColor={tema.border}
           />
+        </View>
+
+        <View style={[styles.section, { backgroundColor: tema.cardBackground, marginTop: 20 }]}>
+          <Text style={[styles.sectionTitle, { color: tema.text }]}>
+            {dil === 'tr' ? 'Bildirim Testi' : 'Notification Test'}
+          </Text>
+          
+          {bildirimIzni ? (
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: tema.success, padding: 15, marginVertical: 10 }]}
+              onPress={testBildirimiGonderVeOnay}
+            >
+              <Text style={[styles.buttonText, { color: '#fff', fontSize: 16, fontWeight: 'bold' }]}>
+                {dil === 'tr' ? 'Test Bildirimi Gönder' : 'Send Test Notification'}
+              </Text>
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={[styles.button, { backgroundColor: tema.warning, padding: 15, marginVertical: 10 }]}
+              onPress={bildirimIzniIste}
+            >
+              <Text style={[styles.buttonText, { color: '#fff', fontSize: 16, fontWeight: 'bold' }]}>
+                {dil === 'tr' ? 'Bildirim İzni İste' : 'Request Notification Permission'}
+              </Text>
+            </TouchableOpacity>
+          )}
+          
+          <Text style={[styles.description, { color: tema.textSecondary, marginTop: 5 }]}>
+            {bildirimIzni 
+              ? (dil === 'tr' ? 'Bildirim izni verildi. Test bildirimini göndermek için butona tıklayın.' : 'Notification permission granted. Click the button to send a test notification.')
+              : (dil === 'tr' ? 'Bildirim izni verilmedi. İzin vermek için butona tıklayın.' : 'Notification permission not granted. Click the button to grant permission.')}
+          </Text>
         </View>
 
         <View style={styles.versionContainer}>
@@ -188,5 +265,19 @@ const styles = StyleSheet.create({
   darkModeOption: {
     backgroundColor: '#fff',
     marginBottom: 0,
+  },
+  button: {
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  buttonText: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: '#fff',
+  },
+  description: {
+    fontSize: 14,
+    marginTop: 8,
   },
 }); 

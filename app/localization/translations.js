@@ -105,6 +105,9 @@ export const translations = {
     ay_10: 'Ekim',
     ay_11: 'Kasım',
     ay_12: 'Aralık',
+
+    bildirimler: 'Bildirimler',
+    bildirimTesti: 'Test Bildirimi Gönder',
   },
   en: {
     // Home Page
@@ -212,6 +215,9 @@ export const translations = {
     ay_10: 'October',
     ay_11: 'November',
     ay_12: 'December',
+
+    bildirimler: 'Notifications',
+    bildirimTesti: 'Send Test Notification',
   },
   de: {
     // Ana Sayfa

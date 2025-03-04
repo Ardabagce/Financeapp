@@ -6,6 +6,7 @@ import { memo } from 'react';
 import TabBar from './components/TabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AyarlarProvider from './context/AyarlarContext';
+import { BildirimProvider } from './context/BildirimContext';
 
 // TabBar'ı memoize edelim
 const MemoizedTabBar = memo(TabBar);
@@ -50,38 +51,40 @@ export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <AyarlarProvider>
-        <FinansProvider>
-          <StatusBar style="auto" />
-          <View style={{ flex: 1 }}>
-            <Stack>
-              <Stack.Screen 
-                name="index" 
-                options={mainScreenOptions}
-              />
-              <Stack.Screen 
-                name="gelir" 
-                options={mainScreenOptions}
-              />
-              <Stack.Screen 
-                name="gider" 
-                options={mainScreenOptions}
-              />
-              <Stack.Screen 
-                name="ayarlar" 
-                options={mainScreenOptions}
-              />
-              <Stack.Screen 
-                name="gelir-ekle"
-                options={modalScreenOptions}
-              />
-              <Stack.Screen 
-                name="gider-ekle"
-                options={modalScreenOptions}
-              />
-            </Stack>
-            <MemoizedTabBar />
-          </View>
-        </FinansProvider>
+        <BildirimProvider>
+          <FinansProvider>
+            <StatusBar style="auto" />
+            <View style={{ flex: 1 }}>
+              <Stack>
+                <Stack.Screen 
+                  name="index" 
+                  options={mainScreenOptions}
+                />
+                <Stack.Screen 
+                  name="gelir" 
+                  options={mainScreenOptions}
+                />
+                <Stack.Screen 
+                  name="gider" 
+                  options={mainScreenOptions}
+                />
+                <Stack.Screen 
+                  name="ayarlar" 
+                  options={mainScreenOptions}
+                />
+                <Stack.Screen 
+                  name="gelir-ekle"
+                  options={modalScreenOptions}
+                />
+                <Stack.Screen 
+                  name="gider-ekle"
+                  options={modalScreenOptions}
+                />
+              </Stack>
+              <MemoizedTabBar />
+            </View>
+          </FinansProvider>
+        </BildirimProvider>
       </AyarlarProvider>
     </GestureHandlerRootView>
   );

@@ -24,11 +24,11 @@
       }
     },
     "android": {
+      "package": "com.ardabagce.GelirGider",
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      },
-      "package": "com.ardabagce.gelirgider"
+      }
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
@@ -55,6 +55,7 @@
         "projectId": "bfd353b2-5a65-4be7-b4be-89bcf7cae651"
       }
     },
-    "sdkVersion": "49.0.0"
+    "sdkVersion": "49.0.0",
+    "newArchEnabled": true
   }
 }
