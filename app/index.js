@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, SafeAreaView, Modal, FlatList } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { Ionicons } from '@expo/vector-icons';
 import { useAyarlar } from './context/AyarlarContext';
+import { useBildirim } from './context/BildirimContext';
 
 export default function AnaSayfa() {
   const router = useRouter();
@@ -30,9 +31,13 @@ export default function AnaSayfa() {
   } = useAyarlar();
   const paraBirimiSembol = getParaBirimiSembol();
   const [aySeciciVisible, setAySeciciVisible] = useState(false);
+  const { kontrolVadesiGelenGiderler } = useBildirim();
 
   const gizliMiktar = (miktar) => {
-    return bakiyeGizli ? '******' : `${paraBirimiSembol}${formatNumber(miktar.toFixed(2))}`;
+    if (miktar === undefined || miktar === null) {
+      return bakiyeGizli ? '******' : `${paraBirimiSembol}0.00`;
+    }
+    return bakiyeGizli ? '******' : `${paraBirimiSembol}${formatNumber((miktar || 0).toFixed(2))}`;
   };
 
   // Kategori toplamlarını hesaplayan fonksiyonlar
@@ -67,6 +72,11 @@ export default function AnaSayfa() {
       miktar
     }));
   };
+
+  useEffect(() => {
+    // Uygulama başladığında vadesi gelen giderleri kontrol et
+    kontrolVadesiGelenGiderler();
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
@@ -212,7 +222,7 @@ export default function AnaSayfa() {
                     {item.kategori}
                   </Text>
                   <Text style={[styles.categoryAmount, { color: tema.text }]}>
-                    {paraBirimiSembol}{formatNumber(item.miktar.toFixed(2))}
+                    {paraBirimiSembol}{formatNumber((item.miktar || 0).toFixed(2))}
                   </Text>
                 </View>
               ))}
@@ -244,7 +254,7 @@ export default function AnaSayfa() {
                     {item.kategori}
                   </Text>
                   <Text style={[styles.categoryAmount, { color: tema.text }]}>
-                    {paraBirimiSembol}{formatNumber(item.miktar.toFixed(2))}
+                    {paraBirimiSembol}{formatNumber((item.miktar || 0).toFixed(2))}
                   </Text>
                 </View>
               ))}

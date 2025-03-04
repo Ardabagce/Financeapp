@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import FinansProvider from './context/FinansContext';
 import { View } from 'react-native';
-import { memo } from 'react';
+import { memo, useEffect } from 'react';
 import TabBar from './components/TabBar';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import AyarlarProvider from './context/AyarlarContext';
@@ -47,6 +47,7 @@ const modalScreenOptions = {
   })
 };
 
+// Ana uygulama yapısı
 export default function Layout() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -79,6 +80,13 @@ export default function Layout() {
                 <Stack.Screen 
                   name="gider-ekle"
                   options={modalScreenOptions}
+                />
+                <Stack.Screen 
+                  name="seyahat-planla"
+                  options={{
+                    headerShown: false,
+                    animation: 'slide_from_right',
+                  }}
                 />
               </Stack>
               <MemoizedTabBar />

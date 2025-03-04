@@ -16,6 +16,7 @@ import {
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { useAyarlar } from './context/AyarlarContext';
+import { useBildirim } from './context/BildirimContext';
 
 export default function GiderEkle() {
   const [miktar, setMiktar] = useState('');
@@ -27,6 +28,7 @@ export default function GiderEkle() {
   const params = useLocalSearchParams();
   const { t, getParaBirimiSembol, tema } = useAyarlar();
   const paraBirimiSembol = getParaBirimiSembol();
+  const { planlaYaklasanBildirim } = useBildirim();
 
   const kategoriler = [
     { id: GIDER_KATEGORILERI.MARKET, ad: t(GIDER_KATEGORILERI.MARKET) },
@@ -52,45 +54,43 @@ export default function GiderEkle() {
   }, [GIDER_KATEGORILERI]);
 
   const giderKaydet = async () => {
-    const temizMiktar = miktar.replace(',', '.');
-    
-    if (!temizMiktar || isNaN(parseFloat(temizMiktar))) {
+    if (!miktar || !aciklama || !kategori) {
       Alert.alert(t('hata'), t('gecerliMiktarGirin'));
       return;
     }
-
-    if (!aciklama) {
-      Alert.alert(t('hata'), t('aciklamaGirin'));
-      return;
-    }
-
+    
     try {
-      if (params.duzenle === 'true') {
-        await giderGuncelle(Number(params.id), {
-          miktar: parseFloat(temizMiktar),
-          aciklama,
-          kategori,
-          tarih: new Date(),
-        });
-      } else {
-        if (yaklasan) {
-          await yaklasanGiderEkle({
-            miktar: parseFloat(temizMiktar),
-            aciklama,
-            kategori,
-            tarih: new Date(),
-          });
-        } else {
-          await giderEkle({
-            miktar: parseFloat(temizMiktar),
-            aciklama,
-            kategori,
-            tarih: new Date(),
-          });
-        }
+      const temizMiktar = miktar.replace(',', '.');
+      
+      if (!temizMiktar || isNaN(parseFloat(temizMiktar))) {
+        Alert.alert(t('hata'), t('gecerliMiktarGirin'));
+        return;
       }
+
+      const yeniGider = {
+        id: Date.now().toString(),
+        miktar: parseFloat(temizMiktar),
+        aciklama,
+        kategori,
+        tarih: new Date().toISOString(),
+        tamamlandi: !yaklasan,
+        olusturulmaTarihi: new Date().toISOString()
+      };
+      
+      await giderEkle(yeniGider);
+      
+      if (yaklasan) {
+        await planlaYaklasanBildirim('gider', {
+          id: yeniGider.id,
+          miktar: yeniGider.miktar,
+          aciklama: yeniGider.aciklama,
+          tarih: yeniGider.tarih
+        });
+      }
+      
       router.back();
     } catch (error) {
+      console.error('Gider kaydetme hatası:', error);
       Alert.alert(t('hata'), t('birHataOlustu'));
     }
   };

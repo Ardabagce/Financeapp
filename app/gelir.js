@@ -141,7 +141,7 @@ export default function Gelir() {
           </Text>
         </View>
         <Text style={[styles.balanceAmount, { color: '#fff' }]}>
-          {paraBirimiSembol}{formatNumber(gelirler.reduce((sum, item) => sum + item.miktar, 0).toFixed(2))}
+          {paraBirimiSembol}{formatNumber((gelirler.reduce((sum, item) => sum + (item.miktar || 0), 0) || 0).toFixed(2))}
         </Text>
         <Text style={[styles.balanceChange, { color: '#fff', opacity: 0.8 }]}>
           {t('buAyEklenenGelir')}: {gelirler.length}

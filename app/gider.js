@@ -1,5 +1,5 @@
-import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert, SafeAreaView, Dimensions, Animated, Pressable } from 'react-native';
+import React, { useState, useRef } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Alert, SafeAreaView, Dimensions, Animated, Pressable, Modal, TouchableWithoutFeedback } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { Ionicons } from '@expo/vector-icons';
@@ -13,8 +13,70 @@ export default function Gider() {
   const { giderler, giderSil, formatNumber, yaklasanGiderler, gideriTamamla, yaklasanGiderSil, GIDER_KATEGORILERI } = useFinans();
   const { t, getParaBirimiSembol, tema } = useAyarlar();
   const paraBirimiSembol = getParaBirimiSembol();
+  const [seciliGiderId, setSeciliGiderId] = useState(null);
+  const [menuAcik, setMenuAcik] = useState(false);
+  
+  // Animasyon değerleri
+  const menuScale = useRef(new Animated.Value(0)).current;
+  const menuOpacity = useRef(new Animated.Value(0)).current;
+  const buttonRotation = useRef(new Animated.Value(0)).current;
+  
+  // Menüyü aç/kapat
+  const toggleMenu = () => {
+    if (menuAcik) {
+      // Menüyü kapat
+      Animated.parallel([
+        Animated.spring(menuScale, {
+          toValue: 0,
+          friction: 5,
+          tension: 40,
+          useNativeDriver: true
+        }),
+        Animated.timing(menuOpacity, {
+          toValue: 0,
+          duration: 150,
+          useNativeDriver: true
+        }),
+        Animated.spring(buttonRotation, {
+          toValue: 0,
+          friction: 5,
+          tension: 40,
+          useNativeDriver: true
+        })
+      ]).start(() => setMenuAcik(false));
+    } else {
+      // Menüyü aç
+      setMenuAcik(true);
+      Animated.parallel([
+        Animated.spring(menuScale, {
+          toValue: 1,
+          friction: 5,
+          tension: 40,
+          useNativeDriver: true
+        }),
+        Animated.timing(menuOpacity, {
+          toValue: 1,
+          duration: 150,
+          useNativeDriver: true
+        }),
+        Animated.spring(buttonRotation, {
+          toValue: 1,
+          friction: 5,
+          tension: 40,
+          useNativeDriver: true
+        })
+      ]).start();
+    }
+  };
+  
+  // Buton döndürme animasyonu için
+  const spin = buttonRotation.interpolate({
+    inputRange: [0, 1],
+    outputRange: ['0deg', '45deg']
+  });
 
   const formatTarih = (tarih) => {
+    if (!tarih) return '';
     return new Date(tarih).toLocaleDateString('tr-TR');
   };
 
@@ -56,7 +118,10 @@ export default function Gider() {
   };
 
   const renderGider = ({ item }) => {
+    // Null veya undefined değerlere karşı koruma
+    const miktar = item.miktar || 0;
     const isYaklasan = yaklasanGiderler.some(g => g.id === item.id);
+    const kategoriAdi = GIDER_KATEGORILERI[item.kategori] || GIDER_KATEGORILERI.DIGER;
     
     return (
       <Swipeable
@@ -81,6 +146,7 @@ export default function Gider() {
                 ]
               );
             }
+            setSeciliGiderId(item.id);
           }}
           style={[
             styles.giderItem,
@@ -92,7 +158,7 @@ export default function Gider() {
           <View style={styles.giderBilgi}>
             <View style={styles.baslikRow}>
               <Text style={[styles.kategori, { color: tema.text }]}>
-                {t(item.kategori?.toLowerCase() || 'kategori_diger')}
+                {t(kategoriAdi)}
               </Text>
               <TouchableOpacity 
                 style={styles.islemButon}
@@ -101,8 +167,8 @@ export default function Gider() {
                   params: {
                     duzenle: 'true',
                     id: item.id,
-                    miktar: item.miktar.toString(),
-                    aciklama: item.aciklama,
+                    miktar: miktar.toString(),
+                    aciklama: item.aciklama || '',
                     kategori: item.kategori || GIDER_KATEGORILERI.DIGER,
                     yaklasan: isYaklasan.toString(),
                   }
@@ -112,14 +178,14 @@ export default function Gider() {
               </TouchableOpacity>
             </View>
             <Text style={[styles.aciklama, { color: tema.textSecondary }]}>
-              {item.aciklama}
+              {item.aciklama || ''}
             </Text>
             <View style={styles.altBilgi}>
               <Text style={[styles.tarih, { color: tema.textTertiary }]}>
                 {formatTarih(item.tarih)}
               </Text>
               <Text style={[styles.miktar, { color: tema.text }]}>
-                {paraBirimiSembol}{formatNumber(item.miktar.toFixed(2))}
+                {paraBirimiSembol}{formatNumber(miktar.toFixed(2))}
               </Text>
             </View>
           </View>
@@ -140,30 +206,114 @@ export default function Gider() {
           </Text>
         </View>
         <Text style={[styles.balanceAmount, { color: '#fff' }]}>
-          {paraBirimiSembol}{formatNumber(giderler.reduce((sum, item) => sum + item.miktar, 0).toFixed(2))}
+          {paraBirimiSembol}{formatNumber(((giderler && giderler.length > 0) ? giderler.reduce((sum, item) => sum + (parseFloat(item.miktar) || 0), 0) : 0).toFixed(2))}
         </Text>
         <Text style={[styles.balanceChange, { color: '#fff', opacity: 0.8 }]}>
-          {t('buAyEklenenGider')}: {giderler.length}
+          {t('buAyEklenenGider')}: {giderler ? giderler.length : 0}
         </Text>
       </View>
 
       {/* Liste */}
       <View style={styles.transactionCards}>
         <FlatList
-          data={[...giderler, ...yaklasanGiderler]}
+          data={[...(giderler || []), ...(yaklasanGiderler || [])]}
           renderItem={renderGider}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={item => (item && item.id) ? item.id.toString() : Math.random().toString()}
           contentContainerStyle={styles.listContent}
         />
       </View>
 
-      {/* Yeni Gider Ekleme Butonu */}
-      <View style={styles.floatingButtonContainer}>
+      {/* Silme Onay Modalı */}
+      <Modal
+        transparent={true}
+        visible={seciliGiderId !== null}
+        onRequestClose={() => setSeciliGiderId(null)}
+        animationType="fade"
+      >
         <TouchableOpacity 
-          style={[styles.floatingButton, { backgroundColor: tema.danger }]}
-          onPress={() => router.push('/gider-ekle')}
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setSeciliGiderId(null)}
         >
-          <Ionicons name="add" size={30} color="#fff" />
+          <View 
+            style={[styles.modalContent, { backgroundColor: tema.cardBackground }]}
+            onStartShouldSetResponder={() => true}
+            onTouchEnd={(e) => e.stopPropagation()}
+          >
+            <Text style={[styles.modalTitle, { color: tema.text }]}>
+              {t('gideriSil')}
+            </Text>
+            <Text style={[styles.modalText, { color: tema.textSecondary }]}>
+              {t('gideriSilOnay')}
+            </Text>
+            <View style={styles.modalButtons}>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.cancelButton]}
+                onPress={() => setSeciliGiderId(null)}
+              >
+                <Text style={styles.modalButtonText}>{t('vazgec')}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.modalButton, styles.deleteButton]}
+                onPress={() => {
+                  gideriSil(seciliGiderId);
+                  setSeciliGiderId(null);
+                }}
+              >
+                <Text style={styles.modalButtonText}>{t('sil')}</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableOpacity>
+      </Modal>
+
+      {/* Animasyonlu Menü */}
+      {menuAcik && (
+        <TouchableWithoutFeedback onPress={toggleMenu}>
+          <View style={styles.menuOverlay}>
+            <Animated.View 
+              style={[
+                styles.menuContainer,
+                {
+                  opacity: menuOpacity,
+                  transform: [{ scale: menuScale }]
+                }
+              ]}
+            >
+              <TouchableOpacity 
+                style={[styles.floatingButton, { backgroundColor: '#FFA726' }]}
+                onPress={() => {
+                  toggleMenu();
+                  router.push('/seyahat-planla');
+                }}
+              >
+                <Ionicons name="airplane" size={28} color="#fff" />
+              </TouchableOpacity>
+              
+              <TouchableOpacity 
+                style={[styles.floatingButton, { backgroundColor: '#f44336', marginTop: 16 }]}
+                onPress={() => {
+                  toggleMenu();
+                  router.push('/gider-ekle');
+                }}
+              >
+                <Ionicons name="remove-circle" size={28} color="#fff" />
+              </TouchableOpacity>
+            </Animated.View>
+          </View>
+        </TouchableWithoutFeedback>
+      )}
+
+      {/* Ana Ekle Butonu */}
+      <View style={styles.mainButtonContainer}>
+        <TouchableOpacity 
+          style={[styles.floatingButton, { backgroundColor: '#f44336' }]}
+          onPress={() => toggleMenu()}
+          onLongPress={() => toggleMenu()}
+        >
+          <Animated.View style={{ transform: [{ rotate: spin }] }}>
+            <Ionicons name="add" size={28} color="white" />
+          </Animated.View>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -219,17 +369,10 @@ const styles = StyleSheet.create({
     paddingTop: 8,
     paddingBottom: 20,
   },
-  floatingButtonContainer: {
-    position: 'absolute',
-    right: 20,
-    bottom: 105,
-    zIndex: 2,
-  },
   floatingButton: {
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#f44336',
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
@@ -322,5 +465,67 @@ const styles = StyleSheet.create({
   tarih: {
     fontSize: 12,
     color: '#666',
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  modalContent: {
+    width: '90%',
+    borderRadius: 12,
+    padding: 20,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginBottom: 12,
+  },
+  modalText: {
+    fontSize: 16,
+    marginBottom: 20,
+    textAlign: 'center',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+  },
+  cancelButton: {
+    backgroundColor: '#7B61FF33',
+  },
+  deleteButton: {
+    backgroundColor: '#f44336',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontWeight: 'bold',
+    fontSize: 16,
+  },
+  menuOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+    alignItems: 'flex-end',
+    zIndex: 998,
+  },
+  menuContainer: {
+    position: 'absolute',
+    bottom: 180,
+    right: 20,
+    alignItems: 'flex-end',
+  },
+  mainButtonContainer: {
+    position: 'absolute',
+    right: 20,
+    bottom: 105,
+    zIndex: 999,
   },
 }); 

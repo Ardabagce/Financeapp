@@ -108,6 +108,42 @@ export const translations = {
 
     bildirimler: 'Bildirimler',
     bildirimTesti: 'Test Bildirimi Gönder',
+
+    seyahatPlanla: 'Seyahat Planla',
+    seyahatBilgileri: 'Seyahat Bilgileri',
+    seyahatAdi: 'Seyahat Adı',
+    baslangicTarihi: 'Başlangıç Tarihi',
+    bitisTarihi: 'Bitiş Tarihi',
+    planlananButce: 'Planlanan Bütçe',
+    notlar: 'Notlar',
+    kaydet: 'Kaydet',
+    seyahatNotlari: 'Seyahat notlarınız...',
+    ornekSeyahatAdi: 'Örn: Yaz Tatili',
+    ornekButce: 'Örn: 5000',
+    tatil: 'Tatil',
+    is: 'İş',
+    aile: 'Aile',
+    diger: 'Diğer',
+
+    // Seyahat sayfası çevirileri
+    hotels: 'Oteller',
+    flights: 'Uçuşlar',
+    cars: 'Arabalar',
+    homes: 'Evler',
+    invite: 'Davet Et',
+    deals: 'Fırsatlar',
+    freeze: 'Dondur',
+    wallet: 'Cüzdan',
+    rewards: 'Ödüller',
+    continueSearch: 'Aramaya devam et',
+    nearbyHotels: 'Yakındaki oteller',
+    exclusiveHotelDeals: 'Özel otel fırsatları yakınlarda',
+    inviteFriends: 'Arkadaşlarını davet et, 100₺ kazan',
+    searchDestination: 'Nereye gitmek istiyorsun?',
+    home: 'Ana Sayfa',
+    friends: 'Arkadaşlar',
+    trips: 'Seyahatler',
+    help: 'Yardım',
   },
   en: {
     // Home Page
@@ -218,6 +254,42 @@ export const translations = {
 
     bildirimler: 'Notifications',
     bildirimTesti: 'Send Test Notification',
+
+    seyahatPlanla: 'Plan Travel',
+    seyahatBilgileri: 'Travel Information',
+    seyahatAdi: 'Travel Name',
+    baslangicTarihi: 'Start Date',
+    bitisTarihi: 'End Date',
+    planlananButce: 'Planned Budget',
+    notlar: 'Notes',
+    kaydet: 'Save',
+    seyahatNotlari: 'Your travel notes...',
+    ornekSeyahatAdi: 'Ex: Summer Vacation',
+    ornekButce: 'Ex: 5000',
+    tatil: 'Vacation',
+    is: 'Business',
+    aile: 'Family',
+    diger: 'Other',
+
+    // Travel page translations
+    hotels: 'Hotels',
+    flights: 'Flights',
+    cars: 'Cars',
+    homes: 'Homes',
+    invite: 'Invite',
+    deals: 'Deals',
+    freeze: 'Freeze',
+    wallet: 'Wallet',
+    rewards: 'Rewards',
+    continueSearch: 'Continue your search',
+    nearbyHotels: 'Nearby hotels',
+    exclusiveHotelDeals: 'Exclusive hotel deals nearby',
+    inviteFriends: 'Invite friends, earn $100',
+    searchDestination: 'Where to?',
+    home: 'Home',
+    friends: 'Friends',
+    trips: 'Trips',
+    help: 'Help',
   },
   de: {
     // Ana Sayfa
@@ -325,6 +397,8 @@ export const translations = {
     ay_10: 'Oktober',
     ay_11: 'November',
     ay_12: 'Dezember',
+
+    seyahatPlanla: 'Reiseplanen',
   }
 };
 

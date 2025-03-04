@@ -257,15 +257,15 @@ function FinansProvider({ children }) {
   }, [giderler, secilenAy]);
 
   // Filtrelenmiş toplamları hesapla
-  const toplamGelir = useMemo(() => 
-    filtreliGelirler.reduce((sum, item) => sum + item.miktar, 0),
-    [filtreliGelirler]
-  );
+  const toplamGelir = useMemo(() => {
+    if (!filtreliGelirler || filtreliGelirler.length === 0) return 0;
+    return filtreliGelirler.reduce((sum, item) => sum + (parseFloat(item.miktar) || 0), 0);
+  }, [filtreliGelirler]);
 
-  const toplamGider = useMemo(() => 
-    filtreliGiderler.reduce((sum, item) => sum + item.miktar, 0),
-    [filtreliGiderler]
-  );
+  const toplamGider = useMemo(() => {
+    if (!filtreliGiderler || filtreliGiderler.length === 0) return 0;
+    return filtreliGiderler.reduce((sum, item) => sum + (parseFloat(item.miktar) || 0), 0);
+  }, [filtreliGiderler]);
 
   const ayDegistir = useCallback((yeniAy) => {
     setSecilenAy(yeniAy);

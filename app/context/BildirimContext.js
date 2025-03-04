@@ -6,6 +6,7 @@ import * as Device from 'expo-device';
 import * as Constants from 'expo-constants';
 import { Platform, Alert } from 'react-native';
 import { useAyarlar } from './AyarlarContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const BildirimContext = createContext();
 
@@ -16,6 +17,8 @@ const bildirimCevirileri = {
     yaklasanGelirIcerik: (miktar, aciklama) => `${miktar} TL tutarında "${aciklama}" geliri yaklaşıyor.`,
     yaklasanGiderBaslik: 'Yaklaşan Gider Hatırlatması',
     yaklasanGiderIcerik: (miktar, aciklama) => `${miktar} TL tutarında "${aciklama}" gideri yaklaşıyor.`,
+    vadesiGelenGiderBaslik: 'Ödeme Zamanı Geldi',
+    vadesiGelenGiderIcerik: (miktar, aciklama) => `${miktar} TL tutarında "${aciklama}" ödemesi bugün yapılmalı.`,
     bildirimIzinHata: 'Bildirim izni alınamadı!'
   },
   en: {
@@ -23,6 +26,8 @@ const bildirimCevirileri = {
     yaklasanGelirIcerik: (miktar, aciklama) => `Upcoming income of ${miktar} for "${aciklama}".`,
     yaklasanGiderBaslik: 'Upcoming Expense Reminder',
     yaklasanGiderIcerik: (miktar, aciklama) => `Upcoming expense of ${miktar} for "${aciklama}".`,
+    vadesiGelenGiderBaslik: 'Payment Due Today',
+    vadesiGelenGiderIcerik: (miktar, aciklama) => `Payment of ${miktar} for "${aciklama}" is due today.`,
     bildirimIzinHata: 'Failed to get notification permission!'
   }
 };
@@ -39,6 +44,7 @@ Notifications.setNotificationHandler({
 export function BildirimProvider({ children }) {
   const [expoPushToken, setExpoPushToken] = useState('');
   const { dil } = useAyarlar();
+  const [planlanmisGiderler, setPlanlanmisGiderler] = useState([]);
 
   // Push bildirimleri için kayıt fonksiyonu
   async function registerForPushNotificationsAsync() {
@@ -92,10 +98,20 @@ export function BildirimProvider({ children }) {
         console.log('Push token:', token);
       }
     });
+    
+    // Uygulama başladığında vadesi gelen giderleri kontrol et
+    kontrolVadesiGelenGiderler();
+    
+    // Her gün kontrol etmek için bir zamanlayıcı ayarla
+    const gunlukKontrol = setInterval(() => {
+      kontrolVadesiGelenGiderler();
+    }, 24 * 60 * 60 * 1000); // 24 saat
+    
+    return () => clearInterval(gunlukKontrol);
   }, []);
 
   // Yaklaşan gelir/gider bildirimi planlama
-  const planlaYaklasanBildirim = async (tip, { miktar, aciklama, tarih }) => {
+  const planlaYaklasanBildirim = async (tip, { miktar, aciklama, tarih, id }) => {
     try {
       const trigger = new Date(tarih);
       trigger.setHours(trigger.getHours() - 24); // 24 saat önce bildirim
@@ -115,16 +131,74 @@ export function BildirimProvider({ children }) {
         content: {
           title: baslik,
           body: icerik,
-          data: { tip, miktar, aciklama }
+          data: { tip, miktar, aciklama, id, tarih }
         },
         trigger,
       });
       
       console.log(`${tip} bildirimi planlandı, ID:`, identifier);
+      
+      // Eğer gider ise, vadesi geldiğinde kontrol etmek için kaydet
+      if (tip === 'gider') {
+        const yeniGider = { id, miktar, aciklama, tarih, bildirimId: identifier };
+        const guncelGiderler = [...planlanmisGiderler, yeniGider];
+        setPlanlanmisGiderler(guncelGiderler);
+        await AsyncStorage.setItem('planlanmisGiderler', JSON.stringify(guncelGiderler));
+      }
+      
       return identifier;
     } catch (error) {
       console.error('Bildirim planlama hatası:', error);
       return null;
+    }
+  };
+
+  // Vadesi gelen giderleri kontrol et ve bildirim gönder
+  const kontrolVadesiGelenGiderler = async () => {
+    try {
+      // AsyncStorage'dan planlanmış giderleri al
+      const kayitliGiderlerJSON = await AsyncStorage.getItem('planlanmisGiderler');
+      const kayitliGiderler = kayitliGiderlerJSON ? JSON.parse(kayitliGiderlerJSON) : [];
+      
+      if (kayitliGiderler.length === 0) return;
+      
+      const bugun = new Date();
+      bugun.setHours(0, 0, 0, 0); // Bugünün başlangıcı
+      
+      const vadesiGelenGiderler = kayitliGiderler.filter(gider => {
+        const giderTarihi = new Date(gider.tarih);
+        giderTarihi.setHours(0, 0, 0, 0);
+        return giderTarihi.getTime() === bugun.getTime();
+      });
+      
+      // Vadesi gelen her gider için bildirim gönder
+      for (const gider of vadesiGelenGiderler) {
+        const ceviriler = bildirimCevirileri[dil];
+        
+        await Notifications.scheduleNotificationAsync({
+          content: {
+            title: ceviriler.vadesiGelenGiderBaslik,
+            body: ceviriler.vadesiGelenGiderIcerik(gider.miktar, gider.aciklama),
+            data: { tip: 'gider', ...gider, vadesiGeldi: true }
+          },
+          trigger: null, // Hemen gönder
+        });
+        
+        console.log(`Vadesi gelen gider bildirimi gönderildi: ${gider.aciklama}`);
+      }
+      
+      // İşlenmiş giderleri listeden çıkar
+      const guncelGiderler = kayitliGiderler.filter(gider => {
+        const giderTarihi = new Date(gider.tarih);
+        giderTarihi.setHours(0, 0, 0, 0);
+        return giderTarihi.getTime() > bugun.getTime();
+      });
+      
+      setPlanlanmisGiderler(guncelGiderler);
+      await AsyncStorage.setItem('planlanmisGiderler', JSON.stringify(guncelGiderler));
+      
+    } catch (error) {
+      console.error('Vadesi gelen gider kontrolü hatası:', error);
     }
   };
 
@@ -182,7 +256,8 @@ export function BildirimProvider({ children }) {
     <BildirimContext.Provider value={{
       expoPushToken,
       planlaYaklasanBildirim,
-      testBildirimiGonder
+      testBildirimiGonder,
+      kontrolVadesiGelenGiderler
     }}>
       {children}
     </BildirimContext.Provider>
