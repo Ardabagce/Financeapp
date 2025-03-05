@@ -22,7 +22,7 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.gelirgider.app",
+      "bundleIdentifier": "com.ardabagce.GelirGider",
       "buildNumber": "1",
       "infoPlist": {
         "CFBundleDisplayName": "GelirGider",
@@ -35,7 +35,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gelirgider.app"
+      "package": "com.ardabagce.GelirGider"
     },
     "web": {
       "favicon": "./assets/favicon.png"
