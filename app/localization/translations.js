@@ -89,7 +89,7 @@ export const translations = {
     aySecin: 'Ay Seçin',
 
     guncelTarih: 'Güncel Tarih',
-    guncelTarihKullaniliyor: 'Güncel tarih kullanılıyor',
+    guncelTarihAciklama: 'Gider kaydının bugünün tarihiyle oluşturulmasını sağlar',
     tamam: 'Tamam',
 
     tumZamanlar: 'Tüm Zamanlar',
@@ -220,6 +220,8 @@ export const translations = {
     seyahatKonum: 'Seyahat Konumu',
     seyahatTarih: 'Seyahat Tarihi',
     seyahatMaliyet: 'Toplam Maliyet',
+
+    tumu: "Tümü",
   },
   en: {
     // Home Page
@@ -311,7 +313,7 @@ export const translations = {
     aySecin: 'Select Month',
 
     guncelTarih: 'Current Date',
-    guncelTarihKullaniliyor: 'Using current date',
+    guncelTarihAciklama: 'Creates the expense record with today\"s date',
     tamam: 'OK',
 
     tumZamanlar: 'All Time',
@@ -457,6 +459,8 @@ export const translations = {
     seyahatKonum: 'Trip Location',
     seyahatTarih: 'Trip Date',
     seyahatMaliyet: 'Total Cost',
+
+    tumu: "All",
   },
   de: {
     // Ana Sayfa
@@ -548,7 +552,7 @@ export const translations = {
     aySecin: 'Monat auswählen',
 
     guncelTarih: 'Aktuelles Datum',
-    guncelTarihKullaniliyor: 'Verwendet aktuelles Datum',
+    guncelTarihAciklama: 'Erstellt den Ausgabeneintrag mit dem heutigen Datum',
     tamam: 'OK',
 
     tumZamanlar: 'Alle Zeit',
@@ -704,6 +708,8 @@ export const translations = {
     seyahatKonum: 'Reiseziel',
     seyahatTarih: 'Reisedatum',
     seyahatMaliyet: 'Gesamtkosten',
+
+    tumu: "Alle",
   }
 };
 

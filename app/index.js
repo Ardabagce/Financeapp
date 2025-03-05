@@ -35,6 +35,7 @@ export default function AnaSayfa() {
   const [aySeciciVisible, setAySeciciVisible] = useState(false);
   const { kontrolVadesiGelenGiderler } = useBildirim();
   const [savedTrips, setSavedTrips] = useState([]);
+  const [seciliFiltre, setSeciliFiltre] = useState('tumu');
 
   const gizliMiktar = (miktar) => {
     if (miktar === undefined || miktar === null) {
@@ -357,6 +358,23 @@ export default function AnaSayfa() {
             </ScrollView>
           </View>
         )}
+
+        {/* Filtre Butonları */}
+        <ScrollView 
+          horizontal 
+          showsHorizontalScrollIndicator={false}
+          style={styles.filterScroll}
+          contentContainerStyle={styles.filterContainer}
+        >
+          <TouchableOpacity 
+            style={[styles.filterButton, seciliFiltre === 'tumu' && styles.activeFilterButton]}
+            onPress={() => setSeciliFiltre('tumu')}
+          >
+            <Text style={[styles.filterText, seciliFiltre === 'tumu' && styles.activeFilterText]}>
+              {t('tumu')}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
       </ScrollView>
 
       {/* Ay Seçici Modal */}
@@ -649,5 +667,28 @@ const styles = StyleSheet.create({
   monthSelectorText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  filterScroll: {
+    margin: 16,
+    marginBottom: 8,
+  },
+  filterContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  filterButton: {
+    padding: 12,
+    borderRadius: 16,
+    marginHorizontal: 4,
+  },
+  filterText: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  activeFilterButton: {
+    backgroundColor: '#000',
+  },
+  activeFilterText: {
+    color: '#fff',
   },
 }); 

@@ -17,12 +17,16 @@ import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useFinans } from './context/FinansContext';
 import { useAyarlar } from './context/AyarlarContext';
 import { useBildirim } from './context/BildirimContext';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 export default function GiderEkle() {
   const [miktar, setMiktar] = useState('');
   const [aciklama, setAciklama] = useState('');
   const [kategori, setKategori] = useState('');
   const [yaklasan, setYaklasan] = useState(false);
+  const [tarih, setTarih] = useState(new Date());
+  const [tarihSeciciAcik, setTarihSeciciAcik] = useState(false);
+  const [guncelTarih, setGuncelTarih] = useState(true);
   const router = useRouter();
   const { giderEkle, giderGuncelle, giderSil, giderler, yaklasanGiderEkle, GIDER_KATEGORILERI } = useFinans();
   const params = useLocalSearchParams();
@@ -50,8 +54,14 @@ export default function GiderEkle() {
       setAciklama(params.aciklama || '');
       setKategori(params.kategori || GIDER_KATEGORILERI.DIGER);
       setYaklasan(params.yaklasan === 'true');
+      setTarih(new Date(params.tarih));
+      setGuncelTarih(params.guncelTarih === 'true');
     }
   }, [GIDER_KATEGORILERI]);
+
+  const formatTarih = (tarih) => {
+    return new Date(tarih).toLocaleDateString('tr-TR');
+  };
 
   const giderKaydet = async () => {
     if (!miktar || !aciklama || !kategori) {
@@ -72,7 +82,7 @@ export default function GiderEkle() {
         miktar: parseFloat(temizMiktar),
         aciklama,
         kategori,
-        tarih: new Date().toISOString(),
+        tarih: guncelTarih ? new Date() : tarih,
         tamamlandi: !yaklasan,
         olusturulmaTarihi: new Date().toISOString()
       };
@@ -209,7 +219,57 @@ export default function GiderEkle() {
 
             <View style={[styles.switchContainer, { backgroundColor: tema.cardBackground }]}>
               <View style={styles.switchInfo}>
-                <Text style={[styles.switchLabel, { color: tema.danger }]}>
+                <Text style={[styles.switchLabel, { color: tema.text }]}>
+                  {t('guncelTarih')}
+                </Text>
+                <Text style={[styles.switchDescription, { color: tema.textSecondary }]}>
+                  {t('guncelTarihAciklama')}
+                </Text>
+              </View>
+              <Switch
+                value={guncelTarih}
+                onValueChange={(value) => {
+                  setGuncelTarih(value);
+                  if (value) {
+                    setTarih(new Date());
+                  }
+                }}
+                trackColor={{ false: tema.border, true: tema.danger + '50' }}
+                thumbColor={guncelTarih ? tema.danger : '#f4f3f4'}
+              />
+            </View>
+
+            {!guncelTarih && (
+              <TouchableOpacity 
+                style={[styles.tarihButon, { 
+                  backgroundColor: tema.cardBackground,
+                  borderColor: tema.border 
+                }]}
+                onPress={() => setTarihSeciciAcik(true)}
+              >
+                <Text style={[styles.tarihText, { color: tema.text }]}>
+                  {formatTarih(tarih)}
+                </Text>
+              </TouchableOpacity>
+            )}
+
+            {tarihSeciciAcik && (
+              <DateTimePicker
+                value={tarih}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setTarihSeciciAcik(false);
+                  if (selectedDate) {
+                    setTarih(selectedDate);
+                  }
+                }}
+              />
+            )}
+
+            <View style={[styles.switchContainer, { backgroundColor: tema.cardBackground }]}>
+              <View style={styles.switchInfo}>
+                <Text style={[styles.switchLabel, { color: tema.text }]}>
                   {t('yaklasanGider')}
                 </Text>
                 <Text style={[styles.switchDescription, { color: tema.textSecondary }]}>
@@ -219,8 +279,8 @@ export default function GiderEkle() {
               <Switch
                 value={yaklasan}
                 onValueChange={setYaklasan}
-                trackColor={{ false: tema.border, true: tema.danger }}
-                thumbColor={yaklasan ? tema.danger : tema.cardBackground}
+                trackColor={{ false: tema.border, true: tema.danger + '50' }}
+                thumbColor={yaklasan ? tema.danger : '#f4f3f4'}
               />
             </View>
 
@@ -344,5 +404,14 @@ const styles = StyleSheet.create({
   deleteButtonText: {
     fontSize: 16,
     fontWeight: '600',
+  },
+  tarihButon: {
+    padding: 15,
+    borderRadius: 10,
+    borderWidth: 1,
+    marginBottom: 20,
+  },
+  tarihText: {
+    fontSize: 16,
   },
 }); 

@@ -394,10 +394,9 @@ const styles = StyleSheet.create({
   giderItem: {
     backgroundColor: '#fff',
     borderRadius: 12,
-    marginBottom: 12,
+    marginBottom: 8,
     flexDirection: 'row',
     alignItems: 'stretch',
-    height: 120,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -446,11 +445,11 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   deleteContainer: {
-    width: 80,
-    height: 120,
+    width: 70,
     backgroundColor: '#ff4444',
     justifyContent: 'center',
     alignItems: 'center',
+    marginBottom: 8,
   },
   deleteButton: {
     flex: 1,
@@ -539,6 +538,6 @@ const styles = StyleSheet.create({
     zIndex: 999,
   },
   swipeableContainer: {
-    marginBottom: 12,
+    marginBottom: 0,
   },
 }); 
