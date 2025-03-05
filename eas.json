@@ -1,6 +1,6 @@
 {
   "cli": {
-    "version": ">= 5.9.1",
+    "version": ">= 3.13.3",
     "appVersionSource": "remote"
   },
   "build": {
@@ -41,6 +41,9 @@
         "ascAppId": "6742241888",
         "appleTeamId": "GQN4W45H29",
         "language": "tr"
+      },
+      "android": {
+        "track": "production"
       }
     }
   }

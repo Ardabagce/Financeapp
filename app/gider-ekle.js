@@ -232,6 +232,17 @@ export default function GiderEkle() {
                 {params?.duzenle ? t('guncelle') : t('kaydet')}
               </Text>
             </TouchableOpacity>
+
+            {params?.duzenle && (
+              <TouchableOpacity 
+                style={[styles.deleteButton, { backgroundColor: tema.cardBackground, borderColor: tema.danger }]}
+                onPress={gideriSil}
+              >
+                <Text style={[styles.deleteButtonText, { color: tema.danger }]}>
+                  {t('sil')}
+                </Text>
+              </TouchableOpacity>
+            )}
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -321,5 +332,17 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  deleteButton: {
+    marginTop: 12,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+    borderWidth: 2,
+    marginHorizontal: 16,
+  },
+  deleteButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 

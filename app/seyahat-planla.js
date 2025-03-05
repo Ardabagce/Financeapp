@@ -35,6 +35,8 @@ export default function SeyahatPlanla() {
   const windowWidth = Dimensions.get('window').width;
   const windowHeight = Dimensions.get('window').height;
 
+  const [expenseModalVisible, setExpenseModalVisible] = useState(false);
+
   // Düzenleme modunda harcama detaylarını yükle
   useEffect(() => {
     const loadTripExpenses = async () => {
@@ -166,6 +168,7 @@ export default function SeyahatPlanla() {
   // Kategori tıklandığında
   const selectCategory = (category) => {
     setSelectedCategory(category);
+    setExpenseModalVisible(true);
     if (!expenses[category.id]) {
       // Kategori için varsayılan boş alanlar oluştur
       const defaultExpenses = {};
@@ -576,50 +579,6 @@ export default function SeyahatPlanla() {
           {renderCategoryGrid()}
         </View>
 
-        {selectedCategory && (
-          <View style={[styles.expenseFieldsContainer, { 
-            backgroundColor: tema.cardBackground,
-            borderColor: tema.border
-          }]}>
-            <Text style={[styles.expenseTitle, { color: tema.text }]}>
-              {selectedCategory.title} {t('harcamalari')}
-            </Text>
-            
-            {selectedCategory.fields.map((field) => (
-              <View key={field} style={styles.expenseField}>
-                <Text style={[styles.expenseFieldLabel, { color: tema.text }]}>
-                  {getFieldTitle(field)}
-                </Text>
-                <View style={[styles.expenseInputContainer, { 
-                  backgroundColor: tema.cardBackground,
-                  borderColor: tema.border
-                }]}>
-                  <TextInput
-                    style={[styles.expenseInput, { color: tema.text }]}
-                    placeholder="0"
-                    placeholderTextColor={tema.textSecondary}
-                    keyboardType="numeric"
-                    value={expenses[selectedCategory.id]?.[field] || ''}
-                    onChangeText={(value) => updateExpense(selectedCategory.id, field, value)}
-                  />
-                  <Text style={[styles.currencySymbol, { color: tema.text }]}>₺</Text>
-                </View>
-              </View>
-            ))}
-
-            <View style={[styles.categoryTotalContainer, { borderTopColor: tema.border }]}>
-              <Text style={[styles.categoryTotalLabel, { color: tema.text }]}>
-                {t('kategori_toplami')}
-              </Text>
-              <Text style={[styles.categoryTotalValue, { color: tema.primary }]}>
-                ₺{Object.values(expenses[selectedCategory.id] || {})
-                    .reduce((sum, value) => sum + (parseFloat(value) || 0), 0)
-                    .toFixed(2)}
-              </Text>
-            </View>
-          </View>
-        )}
-
         <TouchableOpacity 
           style={[styles.saveButton, { backgroundColor: tema.success }]}
           onPress={saveTrip}
@@ -716,6 +675,83 @@ export default function SeyahatPlanla() {
                 </Text>
               </TouchableOpacity>
             </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* Harcama Giriş Modalı */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={expenseModalVisible}
+        onRequestClose={() => setExpenseModalVisible(false)}
+      >
+        <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
+          <View style={[styles.expenseModalContainer, { 
+            backgroundColor: tema.cardBackground,
+            borderColor: tema.border,
+            borderWidth: 1
+          }]}>
+            <View style={[styles.expenseModalHeader, { borderBottomColor: tema.border }]}>
+              <View style={styles.expenseModalTitleContainer}>
+                <View style={[styles.categoryIcon, { backgroundColor: selectedCategory?.color + '20' }]}>
+                  <Ionicons name={selectedCategory?.icon} size={24} color={selectedCategory?.color} />
+                </View>
+                <Text style={[styles.expenseModalTitle, { color: tema.text }]}>
+                  {selectedCategory?.title}
+                </Text>
+              </View>
+              <TouchableOpacity
+                onPress={() => setExpenseModalVisible(false)}
+                style={styles.expenseModalCloseButton}
+              >
+                <Ionicons name="close" size={24} color={tema.text} />
+              </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.expenseModalContent}>
+              {selectedCategory?.fields.map((field) => (
+                <View key={field} style={styles.expenseField}>
+                  <Text style={[styles.expenseFieldLabel, { color: tema.text }]}>
+                    {getFieldTitle(field)}
+                  </Text>
+                  <View style={[styles.expenseInputContainer, { 
+                    backgroundColor: tema.background,
+                    borderColor: tema.border
+                  }]}>
+                    <TextInput
+                      style={[styles.expenseInput, { color: tema.text }]}
+                      placeholder="0"
+                      placeholderTextColor={tema.textSecondary}
+                      keyboardType="numeric"
+                      value={expenses[selectedCategory.id]?.[field] || ''}
+                      onChangeText={(value) => updateExpense(selectedCategory.id, field, value)}
+                    />
+                    <Text style={[styles.currencySymbol, { color: tema.text }]}>₺</Text>
+                  </View>
+                </View>
+              ))}
+
+              <View style={[styles.categoryTotalContainer, { borderTopColor: tema.border }]}>
+                <Text style={[styles.categoryTotalLabel, { color: tema.text }]}>
+                  {t('kategori_toplami')}
+                </Text>
+                <Text style={[styles.categoryTotalValue, { color: tema.primary }]}>
+                  ₺{Object.values(expenses[selectedCategory?.id] || {})
+                      .reduce((sum, value) => sum + (parseFloat(value) || 0), 0)
+                      .toFixed(2)}
+                </Text>
+              </View>
+            </ScrollView>
+
+            <TouchableOpacity
+              style={[styles.expenseModalSaveButton, { backgroundColor: tema.primary }]}
+              onPress={() => setExpenseModalVisible(false)}
+            >
+              <Text style={[styles.expenseModalSaveButtonText, { color: '#FFFFFF' }]}>
+                {t('tamam')}
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </Modal>
@@ -1104,6 +1140,52 @@ const styles = StyleSheet.create({
   },
   savedTripCost: {
     marginLeft: 8,
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  expenseModalContainer: {
+    width: '90%',
+    maxHeight: '80%',
+    borderRadius: 20,
+    overflow: 'hidden',
+    alignSelf: 'center',
+    marginTop: 'auto',
+    marginBottom: 'auto',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    elevation: 5,
+  },
+  expenseModalHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+  },
+  expenseModalTitleContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  expenseModalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginLeft: 12,
+  },
+  expenseModalCloseButton: {
+    padding: 8,
+  },
+  expenseModalContent: {
+    padding: 16,
+  },
+  expenseModalSaveButton: {
+    margin: 16,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  expenseModalSaveButtonText: {
     fontSize: 16,
     fontWeight: 'bold',
   },

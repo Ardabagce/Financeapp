@@ -104,16 +104,22 @@ export default function Gider() {
   };
 
   const renderRightActions = (progress, dragX, item) => {
+    const scale = dragX.interpolate({
+      inputRange: [-100, 0],
+      outputRange: [1, 0],
+      extrapolate: 'clamp',
+    });
+
     return (
-      <View style={styles.deleteContainer}>
-        <TouchableOpacity 
-          style={styles.deleteButton}
-          onPress={() => gideriSil(item.id)}
-        >
-          <Ionicons name="trash-outline" size={22} color="#fff" />
+      <TouchableOpacity 
+        style={styles.deleteContainer}
+        onPress={() => gideriSil(item.id)}
+      >
+        <Animated.View style={[styles.deleteButton, { transform: [{ scale }] }]}>
+          <Ionicons name="trash-outline" size={24} color="#fff" />
           <Text style={styles.deleteText}>{t('silButon')}</Text>
-        </TouchableOpacity>
-      </View>
+        </Animated.View>
+      </TouchableOpacity>
     );
   };
 
@@ -130,6 +136,8 @@ export default function Gider() {
         }
         overshootRight={false}
         friction={2}
+        rightThreshold={40}
+        containerStyle={styles.swipeableContainer}
       >
         <Pressable
           onLongPress={() => {
@@ -146,7 +154,6 @@ export default function Gider() {
                 ]
               );
             }
-            setSeciliGiderId(item.id);
           }}
           style={[
             styles.giderItem,
@@ -390,6 +397,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     flexDirection: 'row',
     alignItems: 'stretch',
+    height: 120,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -438,19 +446,21 @@ const styles = StyleSheet.create({
     marginLeft: 8,
   },
   deleteContainer: {
-    marginBottom: 12,
-    width: 90,
+    width: 80,
+    height: 120,
+    backgroundColor: '#ff4444',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   deleteButton: {
     flex: 1,
-    backgroundColor: '#ff4444',
     justifyContent: 'center',
     alignItems: 'center',
     width: '100%',
   },
   deleteText: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 4,
     fontWeight: '500',
   },
@@ -527,5 +537,8 @@ const styles = StyleSheet.create({
     right: 20,
     bottom: 105,
     zIndex: 999,
+  },
+  swipeableContainer: {
+    marginBottom: 12,
   },
 }); 

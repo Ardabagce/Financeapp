@@ -189,199 +189,171 @@ export default function AnaSayfa() {
 
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: tema.background }]}>
-      <ScrollView 
-        style={[styles.container, { backgroundColor: tema.background }]}
-        contentContainerStyle={[styles.content, { paddingBottom: 60 }]}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Ay Seçici */}
-        <View style={[styles.aySeciciContainer, { backgroundColor: tema.cardBackground }]}>
-          <TouchableOpacity 
-            style={styles.aySeciciButton}
-            onPress={() => setAySeciciVisible(true)}
-          >
-            <View style={styles.aySeciciContent}>
-              <Ionicons 
-                name="calendar-outline" 
-                size={20} 
-                color={tema.primary}
-                style={styles.aySeciciIcon}
-              />
-              <Text style={[styles.aySeciciText, { color: tema.text }]}>
-                {aylar[secilenAy]}
-              </Text>
-              <Ionicons 
-                name="chevron-down-outline" 
-                size={20} 
-                color={tema.textSecondary}
-              />
-            </View>
-          </TouchableOpacity>
-        </View>
+      <ScrollView style={styles.scrollView}>
+        {/* Ay Seçici Buton */}
+        <TouchableOpacity 
+          style={[styles.monthSelector, { backgroundColor: tema.cardBackground }]}
+          onPress={() => setAySeciciVisible(true)}
+        >
+          <View style={styles.monthSelectorContent}>
+            <Ionicons name="calendar-outline" size={24} color={tema.primary} />
+            <Text style={[styles.monthSelectorText, { color: tema.text }]}>
+              {secilenAy === 'all' ? 'Tümü' : t(secilenAy)}
+            </Text>
+            <Ionicons name="chevron-down" size={24} color={tema.textSecondary} />
+          </View>
+        </TouchableOpacity>
 
-        {/* Üst Kart */}
-        <View style={[styles.topCard, { backgroundColor: tema.primary }]}>
-          <View style={styles.topCardHeader}>
-            <Text style={[styles.topCardTitle, { color: '#fff' }]}>
+        {/* Üst Bilgi Kartı */}
+        <View style={[styles.topCard, { backgroundColor: tema.cardBackground }]}>
+          <View style={styles.balanceSection}>
+            <Text style={[styles.balanceTitle, { color: tema.textSecondary }]}>
               {t('toplamBakiye')}
             </Text>
-            <TouchableOpacity 
-              onPress={() => bakiyeGizliDegistir(!bakiyeGizli)}
-              style={styles.eyeButton}
-            >
+            <View style={styles.balanceRow}>
+              <Text style={[styles.balanceAmount, { color: tema.text }]}>
+                {gizliMiktar(bakiye)}
+              </Text>
+              <TouchableOpacity 
+                onPress={() => bakiyeGizliDegistir(!bakiyeGizli)}
+                style={styles.eyeButton}
+              >
+                <Ionicons 
+                  name={bakiyeGizli ? "eye-off" : "eye"} 
+                  size={24} 
+                  color={tema.textSecondary} 
+                />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.balanceChange}>
               <Ionicons 
-                name={bakiyeGizli ? "eye-off-outline" : "eye-outline"} 
-                size={24} 
-                color="#fff" 
+                name={bakiye >= 0 ? "trending-up" : "trending-down"} 
+                size={20} 
+                color={bakiye >= 0 ? tema.success : tema.error} 
               />
-            </TouchableOpacity>
+              <Text style={[styles.changeText, { 
+                color: bakiye >= 0 ? tema.success : tema.error,
+                marginLeft: 4
+              }]}>
+                {bakiye >= 0 ? t('artis') : t('azalis')}
+              </Text>
+            </View>
           </View>
-          <Text style={[styles.balanceAmount, { color: '#fff' }]}>
-            {gizliMiktar(bakiye)}
-          </Text>
-          <Text style={[styles.balanceChange, { color: '#fff' }]}>
-            {bakiye >= 0 ? '↑' : '↓'} {t('sonHaftayaGore')} {gizliMiktar(Math.abs(bakiye))} {bakiye >= 0 ? t('artis') : t('azalis')}
-          </Text>
-        </View>
 
-        {/* İşlem Kartları */}
-        <View style={styles.transactionCards}>
-          <TouchableOpacity 
-            style={[
-              styles.card, 
-              styles.incomeCard,
-              { backgroundColor: tema.cardBackground }
-            ]}
-            onPress={() => router.push('/gelir')}
-          >
-            <View style={styles.cardContent}>
-              <Text style={[styles.cardTitle, { color: tema.text }]}>
+          <View style={styles.statsRow}>
+            <View style={[styles.statCard, { backgroundColor: tema.background }]}>
+              <Text style={[styles.statTitle, { color: tema.textSecondary }]}>
                 {t('gelirler')}
               </Text>
-              <Text style={[styles.cardAmount, { color: tema.text }]}>
+              <Text style={[styles.statAmount, { color: tema.success }]}>
                 {gizliMiktar(toplamGelir)}
               </Text>
             </View>
-            {!bakiyeGizli && (
-              <View style={[styles.categoryList, { borderTopColor: tema.border }]}>
-                {getGelirKategoriToplam().map((item, index) => (
-                  <View key={index} style={styles.categoryItem}>
-                    <Text style={[styles.categoryName, { color: tema.textSecondary }]}>
-                      {item.kategori}
-                    </Text>
-                    <Text style={[styles.categoryAmount, { color: tema.text }]}>
-                      {paraBirimiSembol}{formatNumber((item.miktar || 0).toFixed(2))}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
-          </TouchableOpacity>
-
-          <TouchableOpacity 
-            style={[
-              styles.card, 
-              styles.expenseCard,
-              { backgroundColor: tema.cardBackground }
-            ]}
-            onPress={() => router.push('/gider')}
-          >
-            <View style={styles.cardContent}>
-              <Text style={[styles.cardTitle, { color: tema.text }]}>
+            <View style={[styles.statCard, { backgroundColor: tema.background }]}>
+              <Text style={[styles.statTitle, { color: '#FF4B4B' }]}>
                 {t('giderler')}
               </Text>
-              <Text style={[styles.cardAmount, { color: tema.text }]}>
+              <Text style={[styles.statAmount, { color: '#FF4B4B' }]}>
                 {gizliMiktar(toplamGider)}
               </Text>
             </View>
-            {!bakiyeGizli && (
-              <View style={[styles.categoryList, { borderTopColor: tema.border }]}>
-                {getGiderKategoriToplam().map((item, index) => (
-                  <View key={index} style={styles.categoryItem}>
-                    <Text style={[styles.categoryName, { color: tema.textSecondary }]}>
-                      {item.kategori}
-                    </Text>
-                    <Text style={[styles.categoryAmount, { color: tema.text }]}>
-                      {paraBirimiSembol}{formatNumber((item.miktar || 0).toFixed(2))}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            )}
+          </View>
+        </View>
+
+        {/* Hızlı İşlemler */}
+        <View style={styles.quickActionsContainer}>
+          <TouchableOpacity 
+            style={[styles.quickActionButton, { backgroundColor: tema.success + '20' }]}
+            onPress={() => router.push('/gelir-ekle')}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: tema.success + '40' }]}>
+              <Ionicons name="add-circle" size={24} color={tema.success} />
+            </View>
+            <Text style={[styles.quickActionText, { color: tema.success }]}>
+              {t('yeniGelir')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.quickActionButton, { backgroundColor: '#FF4B4B40' }]}
+            onPress={() => router.push('/gider-ekle')}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: '#FF4B4B80' }]}>
+              <Ionicons name="remove-circle" size={24} color="#FF4B4B" />
+            </View>
+            <Text style={[styles.quickActionText, { color: '#FF4B4B' }]}>
+              {t('yeniGider')}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity 
+            style={[styles.quickActionButton, { backgroundColor: tema.primary + '20' }]}
+            onPress={() => router.push('/seyahat-planla')}
+          >
+            <View style={[styles.quickActionIcon, { backgroundColor: tema.primary + '40' }]}>
+              <Ionicons name="airplane" size={24} color={tema.primary} />
+            </View>
+            <Text style={[styles.quickActionText, { color: tema.primary }]}>
+              {t('seyahatPlanla')}
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Seyahat Kartları */}
+        {/* Planlanan Seyahatler */}
         {savedTrips.length > 0 && (
-          <View style={[styles.savedTripsContainer, { 
-            backgroundColor: tema.cardBackground,
-            borderColor: tema.border,
-            marginHorizontal: 16,
-            marginBottom: 16
-          }]}>
-            <View style={[styles.savedTripsHeader, { borderBottomColor: tema.border }]}>
-              <Ionicons name="airplane" size={24} color={tema.primary} />
-              <Text style={[styles.savedTripsTitle, { color: tema.text }]}>
-                {t('planlanmisSeyahatler')}
-              </Text>
+          <View style={[styles.tripsContainer, { backgroundColor: tema.cardBackground }]}>
+            <View style={styles.sectionHeader}>
+              <View style={styles.sectionTitleRow}>
+                <Ionicons name="map" size={24} color={tema.primary} />
+                <Text style={[styles.sectionTitle, { color: tema.text }]}>
+                  {t('planlanmisSeyahatler')}
+                </Text>
+              </View>
             </View>
             <ScrollView 
               horizontal 
               showsHorizontalScrollIndicator={false}
-              contentContainerStyle={styles.savedTripsScrollContent}
+              style={styles.tripsScrollView}
             >
-              {savedTrips.map((trip, index) => (
-                <TouchableOpacity 
-                  key={trip.id}
-                  style={[styles.savedTripCard, { 
-                    backgroundColor: tema.cardBackground,
-                    borderColor: tema.border,
-                    marginRight: index === savedTrips.length - 1 ? 16 : 8
-                  }]}
-                  onPress={() => {
-                    // Seyahat detaylarını route params olarak gönder
-                    router.push({
-                      pathname: '/seyahat-planla',
-                      params: {
-                        editMode: true,
-                        tripId: trip.id,
-                        location: trip.location,
-                        startDate: trip.startDate,
-                        endDate: trip.endDate,
-                        totalCost: trip.totalCost,
-                        expenses: JSON.stringify(trip.expenses || {}) // Harcama detaylarını JSON string olarak gönder
-                      }
-                    });
-                  }}
-                >
+              {savedTrips
+                .map((trip, index) => (
                   <TouchableOpacity 
-                    style={[styles.deleteTripButton, { backgroundColor: tema.error + '20' }]}
-                    onPress={() => deleteTrip(trip.id)}
+                    key={trip.id}
+                    style={[styles.tripCard, { 
+                      backgroundColor: tema.background,
+                      marginRight: index === savedTrips.length - 1 ? 16 : 8
+                    }]}
+                    onPress={() => {
+                      router.push({
+                        pathname: '/seyahat-planla',
+                        params: {
+                          editMode: true,
+                          tripId: trip.id,
+                          location: trip.location,
+                          startDate: trip.startDate,
+                          endDate: trip.endDate,
+                          totalCost: trip.totalCost,
+                          expenses: JSON.stringify(trip.expenses || {})
+                        }
+                      });
+                    }}
                   >
-                    <Ionicons name="trash-outline" size={20} color={tema.error} />
-                  </TouchableOpacity>
-                  <View style={[styles.savedTripImageContainer, { backgroundColor: tema.primary + '20' }]}>
-                    <Ionicons name="airplane" size={32} color={tema.primary} />
-                  </View>
-                  <View style={styles.savedTripDetails}>
-                    <Text style={[styles.savedTripLocation, { color: tema.text }]} numberOfLines={1}>
-                      {trip.location}
-                    </Text>
-                    <View style={styles.savedTripDateContainer}>
-                      <Ionicons name="calendar-outline" size={14} color={tema.textSecondary} />
-                      <Text style={[styles.savedTripDate, { color: tema.textSecondary }]}>
-                        {new Date(trip.startDate).toLocaleDateString('tr-TR')} - {new Date(trip.endDate).toLocaleDateString('tr-TR')}
-                      </Text>
+                    <View style={[styles.tripImageContainer, { backgroundColor: tema.primary + '20' }]}>
+                      <Ionicons name="airplane" size={32} color={tema.primary} />
                     </View>
-                    <View style={styles.savedTripCostContainer}>
-                      <Ionicons name="wallet-outline" size={14} color={tema.primary} />
-                      <Text style={[styles.savedTripCost, { color: tema.primary }]}>
+                    <View style={styles.tripInfo}>
+                      <Text style={[styles.tripLocation, { color: tema.text }]} numberOfLines={1}>
+                        {trip.location}
+                      </Text>
+                      <Text style={[styles.tripDate, { color: tema.textSecondary }]} numberOfLines={1}>
+                        {new Date(trip.startDate).toLocaleDateString()} - {new Date(trip.endDate).toLocaleDateString()}
+                      </Text>
+                      <Text style={[styles.tripCost, { color: tema.primary }]}>
                         {paraBirimiSembol}{formatNumber(trip.totalCost.toFixed(2))}
                       </Text>
                     </View>
-                  </View>
-                </TouchableOpacity>
-              ))}
+                  </TouchableOpacity>
+                ))}
             </ScrollView>
           </View>
         )}
@@ -459,133 +431,160 @@ export default function AnaSayfa() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    position: 'relative',
   },
-  content: {
-    flexGrow: 1,
-    paddingTop: 16,
+  scrollView: {
+    flex: 1,
+    paddingBottom: 60,
   },
   topCard: {
-    backgroundColor: '#7B61FF',
     margin: 16,
+    borderRadius: 20,
     padding: 20,
-    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
-  topCardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+  balanceSection: {
     alignItems: 'center',
-    marginBottom: 10,
+    marginBottom: 20,
   },
-  topCardTitle: {
-    color: '#fff',
+  balanceTitle: {
     fontSize: 16,
-    opacity: 0.9,
-  },
-  balanceAmount: {
-    color: '#fff',
-    fontSize: 32,
-    fontWeight: 'bold',
     marginBottom: 8,
   },
-  balanceChange: {
-    color: '#fff',
-    fontSize: 14,
-    opacity: 0.9,
-  },
-  transactionCards: {
-    padding: 16,
-    width: '100%',
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.2,
-    shadowRadius: 1.41,
-    elevation: 2,
-  },
-  incomeCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#4CAF50',
-  },
-  expenseCard: {
-    borderLeftWidth: 4,
-    borderLeftColor: '#f44336',
-  },
-  cardContent: {
+  balanceRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
+    marginBottom: 8,
   },
-  cardTitle: {
-    fontSize: 16,
-  },
-  cardAmount: {
-    fontSize: 18,
+  balanceAmount: {
+    fontSize: 36,
     fontWeight: 'bold',
+    marginRight: 12,
   },
-  eyeButton: {
-    padding: 5,
-  },
-  categoryList: {
-    marginTop: 10,
-    borderTopWidth: 1,
-    paddingTop: 10,
-  },
-  categoryItem: {
+  balanceChange: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 4,
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 20,
   },
-  categoryName: {
-    fontSize: 12,
-  },
-  categoryAmount: {
-    fontSize: 12,
+  changeText: {
+    fontSize: 14,
     fontWeight: '500',
   },
-  aySeciciContainer: {
-    margin: 16,
-    borderRadius: 12,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3.84,
-    elevation: 5,
+  statsRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 16,
   },
-  aySeciciButton: {
+  statCard: {
+    flex: 1,
     padding: 16,
+    borderRadius: 12,
+    marginHorizontal: 4,
+    alignItems: 'center',
   },
-  aySeciciContent: {
+  statTitle: {
+    fontSize: 14,
+    marginBottom: 8,
+  },
+  statAmount: {
+    fontSize: 20,
+    fontWeight: 'bold',
+  },
+  quickActionsContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    marginBottom: 24,
+  },
+  quickActionButton: {
+    flex: 1,
+    marginHorizontal: 4,
+    padding: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  quickActionIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  quickActionText: {
+    fontSize: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  tripsContainer: {
+    marginHorizontal: 16,
+    marginBottom: 50,
+    borderRadius: 20,
+    padding: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  sectionHeader: {
+    marginBottom: 16,
+  },
+  sectionTitleRow: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginLeft: 8,
+  },
+  tripsScrollView: {
+    marginLeft: 0,
+  },
+  tripCard: {
+    width: 200,
+    borderRadius: 16,
+    marginLeft: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tripImageContainer: {
+    height: 100,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
     justifyContent: 'center',
+    alignItems: 'center',
   },
-  aySeciciIcon: {
-    marginRight: 8,
+  tripInfo: {
+    padding: 12,
   },
-  aySeciciText: {
+  tripLocation: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 4,
+  },
+  tripDate: {
+    fontSize: 12,
+    marginBottom: 8,
+  },
+  tripCost: {
     fontSize: 16,
     fontWeight: '600',
-    marginRight: 8,
   },
   modalOverlay: {
     flex: 1,
@@ -627,82 +626,28 @@ const styles = StyleSheet.create({
   ayItemText: {
     fontSize: 16,
   },
-  savedTripsContainer: {
-    borderRadius: 16,
-    borderWidth: 1,
-    overflow: 'hidden',
-    marginHorizontal: 16,
-    marginBottom: 16,
-    width: 'auto',
-  },
-  savedTripsHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 16,
-    borderBottomWidth: 1,
-    backgroundColor: 'transparent',
-  },
-  savedTripsTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginLeft: 8,
-  },
-  savedTripsScrollContent: {
-    paddingVertical: 16,
-    paddingLeft: 16,
-  },
-  savedTripCard: {
-    width: 280,
-    borderRadius: 12,
-    borderWidth: 1,
-    overflow: 'hidden',
-    marginRight: 8,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 1,
-    },
-    shadowOpacity: 0.22,
-    shadowRadius: 2.22,
-  },
-  savedTripImageContainer: {
-    height: 120,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  savedTripDetails: {
-    padding: 12,
-  },
-  savedTripLocation: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 8,
-  },
-  savedTripDateContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 6,
-  },
-  savedTripDate: {
-    marginLeft: 6,
-    fontSize: 12,
-  },
-  savedTripCostContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  savedTripCost: {
-    marginLeft: 6,
-    fontSize: 14,
-    fontWeight: 'bold',
-  },
-  deleteTripButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    zIndex: 1,
+  eyeButton: {
     padding: 8,
     borderRadius: 20,
+  },
+  monthSelector: {
+    margin: 16,
+    marginBottom: 8,
+    padding: 12,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  monthSelectorContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  monthSelectorText: {
+    fontSize: 16,
+    fontWeight: '600',
   },
 }); 
